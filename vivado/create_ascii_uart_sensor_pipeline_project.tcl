@@ -1,6 +1,6 @@
 set script_dir [file normalize [file dirname [info script]]]
 set repo_root [file normalize [file join $script_dir ..]]
-set project_name ascii_uart_sensor_pipeline_reference
+set project_name ascii_uart_sensor_pipeline
 set project_dir [file normalize [file join $repo_root .vivado $project_name]]
 
 file mkdir $project_dir
@@ -14,42 +14,30 @@ set source_files [list \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports watch_stopwatch display_select.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports 10000_counter fnd_controller.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports watch_stopwatch input_conditioning.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports watch_stopwatch time_set_module.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports watch_stopwatch watch_datapath.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports watch_stopwatch watch_fsm.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports watch_stopwatch stopwatch_datapath.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports watch_stopwatch stopwatch_fsm.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports watch_stopwatch stopwatch_unit.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports watch_stopwatch time_set_module.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports watch_stopwatch watch_datapath.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports watch_stopwatch watch_fsm.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports watch_stopwatch watch_stopwatch.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports 10000_counter button_debounce.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports uart uart.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports uart uart_rx.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports uart uart_loopback.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports fifo fifo.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports uart_fifo uart_fifo_loopback.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports ascii_codec ascii_decoder.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports ascii_codec ascii_sender.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports sensor_sr04 sr04.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports sensor_sr04 sr04_fnd_controller.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports sensor_dht11 dht11.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new ascii_uart_sensor_pipeline_defs.vh] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new ascii_command_decoder.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new ascii_uart_sensor_pipeline.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new remote_input_unit.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new dht11.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new fnd_controller_dht11.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new sr04_controller.v] \
 ]
 
 set sim_files [list \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 imports watch_stopwatch tb_watch_stopwatch.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 imports watch_stopwatch tb_watch_set.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 imports watch_stopwatch tb_watch_unit.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 imports watch_stopwatch tb_watch.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 imports watch_stopwatch tb_debouncer.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 imports watch_stopwatch tb_input_conditioning.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 imports watch_stopwatch tb_stopwatch_datapath.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 imports watch_stopwatch tb_stopwatch_fsm.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 imports watch_stopwatch tb_stopwatch_unit.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 imports uart tb_uart_loopback.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 imports fifo tb_fifo.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 imports uart_fifo tb_uart_fifo_loopback.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 imports ascii_codec tb_fifo_ascii_decoder.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 imports sensor_sr04 tb_sr04.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 imports sensor_dht11 tb_dht11.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 new tb_dht11_jm.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 new tb_remote_input_unit.v] \
+    [file join $repo_root wcfg tb_remote_input_unit_wave.wcfg] \
 ]
 
 set constraint_files [list \
@@ -61,8 +49,8 @@ add_files -fileset sources_1 $source_files
 add_files -fileset sim_1 $sim_files
 add_files -fileset constrs_1 $constraint_files
 
-set_property top watch_stopwatch [get_filesets sources_1]
-set_property top tb_watch_stopwatch [get_filesets sim_1]
+set_property top remote_input_unit [get_filesets sources_1]
+set_property top tb_remote_input_unit [get_filesets sim_1]
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
