@@ -2,9 +2,9 @@
 
 `include "ascii_uart_sensor_pipeline_defs.vh"
 
-// INPUT-stage smoke TB:
-// runs minimal checks for remote_input_unit, input_conditioning,
-// and context_manager in one sequence.
+// INPUT 단계 smoke TB:
+// remote_input_unit, input_conditioning, context_manager를
+// 하나의 짧은 시나리오로 최소 확인한다.
 module tb_input_unit;
     localparam integer BIT_PERIOD_NS = 104166;
 
@@ -53,10 +53,12 @@ module tb_input_unit;
     reg seen_remote_status;
     reg seen_unknown_cmd;
 
-    // Fast TB parameters:
+    // 이 TB는 INPUT direct child 3개를 따로 인스턴스해서,
+    // function/output 통합 전에 top 경계 의도가 맞는지만 먼저 확인한다.
+    // 빠른 TB용 파라미터:
     // - SAMPLE_COUNT = CLK_FREQ_HZ / BD_HZ = 10 clocks
-    // - HOLD_TIME_BTN_R is intentionally larger than one debounce-high plus
-    //   one debounce-low window so that both short and hold can be tested.
+    // - HOLD_TIME_BTN_R은 debounce-high + debounce-low 구간보다 길게 잡아
+    //   short와 hold를 둘 다 시험할 수 있게 한다.
     input_conditioning #(
         .CLK_FREQ_HZ(1000),
         .BD_HZ(100),
@@ -88,8 +90,8 @@ module tb_input_unit;
         .o_sw15(o_sw15)
     );
 
-    // This revision intentionally keeps raw switch handling here so that
-    // synchronizer follow-up can be observed later in top-level verification.
+    // 현재 revision에서는 raw switch를 그대로 써서,
+    // 나중에 top-level 검증에서 synchronizer 후속 작업을 분리해 볼 수 있게 한다.
     context_manager DUT_CONTEXT_MANAGER (
         .clk(clk),
         .rst(rst),
@@ -117,6 +119,8 @@ module tb_input_unit;
 
     always #5 clk = ~clk;
 
+    // 1-cycle pulse를 직접 눈으로 찾지 않아도 되도록
+    // sticky observation flag로 최종 체크를 단순화한다.
     always @(posedge rst or posedge o_btnR) begin
         if (rst) seen_local_btnR <= 1'b0;
         else seen_local_btnR <= 1'b1;
@@ -156,6 +160,8 @@ module tb_input_unit;
         input [7:0] data_byte;
         integer bit_idx;
         begin
+            // 8N1 UART frame:
+            // start bit, 8 data bits(LSB-first), stop bit
             rx = 1'b0;
             #(BIT_PERIOD_NS);
             for (bit_idx = 0; bit_idx < 8; bit_idx = bit_idx + 1) begin
@@ -169,6 +175,7 @@ module tb_input_unit;
 
     task automatic send_text_btnR;
         begin
+            // Remote parser는 delimiter가 와야 token 종료로 본다.
             send_uart_byte("b");
             send_uart_byte("t");
             send_uart_byte("n");
@@ -192,7 +199,7 @@ module tb_input_unit;
     task automatic press_btnR_short;
         begin
             btnR = 1'b1;
-            // Long enough to pass debounce, short enough to avoid HOLD_TIME_BTN_R.
+            // debounce는 통과하지만 HOLD_TIME_BTN_R까지는 가지 않게 누른다.
             repeat (100) @(posedge clk);
             btnR = 1'b0;
             repeat (120) @(posedge clk);
@@ -201,6 +208,7 @@ module tb_input_unit;
 
     task automatic press_btnR_hold;
         begin
+            // debounce와 hold threshold를 모두 넘을 만큼 길게 누른다.
             btnR = 1'b1;
             repeat (230) @(posedge clk);
             btnR = 1'b0;
@@ -218,10 +226,10 @@ module tb_input_unit;
     endtask
 
     initial begin
-        // This TB checks:
-        // 1) remote ASCII ingress for btnR and status
-        // 2) local button conditioning for btnR short/hold and btnC short
-        // 3) local switch decoding into current_context and context option outputs
+        // 이 TB가 확인하는 것:
+        // 1) remote ASCII ingress에서 btnR/status가 나오는지
+        // 2) local button conditioning에서 btnR short/hold, btnC short가 나오는지
+        // 3) local switch가 current_context와 option으로 해석되는지
         clk = 1'b0;
         rst = 1'b1;
         btnU = 1'b0;
@@ -243,7 +251,7 @@ module tb_input_unit;
         repeat (5) @(negedge clk);
         rst = 1'b0;
 
-        // Check 0: reset default context is watch.
+        // Check 0: reset 직후 기본 context는 watch여야 한다.
         @(posedge clk);
         #1;
         if (current_context !== `CTX_WATCH) $fatal(1, "default current_context mismatch");
@@ -273,7 +281,9 @@ module tb_input_unit;
         press_btnC_short();
         if (!seen_local_btnC) $fatal(1, "local btnC short pulse missing");
 
-        // Check 6: context transition to DHT11 and sw15 option decode.
+        // Check 6: DHT11으로 context 전환되고 sw15 option decode가 맞는지 본다.
+        // context_manager는 1-cycle transition pulse를 내므로
+        // 첫 clock 직후 바로 샘플링한다.
         @(negedge clk);
         sw_context = `CTX_DHT11;
         sw15 = 1'b1;
@@ -286,7 +296,8 @@ module tb_input_unit;
         #1;
         if (context_change_pulse !== 1'b0) $fatal(1, "context_change_pulse should be one cycle");
 
-        // Check 7: transition back to WATCH and watch option decode.
+        // Check 7: WATCH로 돌아오면 같은 sw15 값이 watch 12h option으로
+        // 다시 해석돼야 한다.
         @(negedge clk);
         sw_context = `CTX_WATCH;
         @(posedge clk);

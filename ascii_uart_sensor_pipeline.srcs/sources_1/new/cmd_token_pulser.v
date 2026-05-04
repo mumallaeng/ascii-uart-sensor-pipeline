@@ -16,7 +16,7 @@ module cmd_token_pulser (
     output reg cmd_clr
 );
 
-    // One-shot decode FSM matched to the design docs:
+    // 설계 문서에 맞춘 one-shot decode FSM:
     // IDLE -> OUTPUT -> IDLE
     localparam IDLE = 1'b0;
     localparam OUTPUT = 1'b1;
@@ -49,14 +49,15 @@ module cmd_token_pulser (
         case (state_reg)
             IDLE: begin
                 if (i_cmd_token_valid) begin
-                    // Latch one canonical command code, then emit exactly one pulse.
+                    // canonical command code 하나를 잡아두고
+                    // 다음 상태에서 정확히 1번만 pulse를 낸다.
                     cmd_token_code_next = i_cmd_token_code;
                     state_next = OUTPUT;
                 end
             end
 
             OUTPUT: begin
-                // Only one command pulse should be asserted in this state.
+                // 이 상태에서는 command pulse가 정확히 하나만 올라가야 한다.
                 case (cmd_token_code_reg)
                     `CMD_BTNR: cmd_btnR = 1'b1;
                     `CMD_BTNR_HOLD: cmd_btnR_hold = 1'b1;

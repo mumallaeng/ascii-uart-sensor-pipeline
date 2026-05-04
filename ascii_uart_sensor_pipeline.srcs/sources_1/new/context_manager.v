@@ -13,11 +13,11 @@ module context_manager (
     output o_dht11_show_humi
 );
 
-    // Project note:
-    // - This block intentionally uses the raw switch inputs in the current
-    //   revision. Synchronizer insertion is left for a later follow-up step.
-    // - sw[1:0] selects the top-level context.
-    // - sw15 is decoded as a context-specific option only after the context is known.
+    // 프로젝트 메모:
+    // - 현재 revision에서는 raw switch를 그대로 사용한다.
+    //   synchronizer 추가는 후속 작업으로 남겨 둔다.
+    // - sw[1:0]는 top-level context 선택값이다.
+    // - sw15는 context가 정해진 뒤에 context별 option으로 해석한다.
 
     wire [`CTX_W-1:0] w_decoded_context;
 
