@@ -26,8 +26,9 @@ set source_files [list \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports uart uart_rx.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports fifo fifo.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new ascii_uart_sensor_pipeline_defs.vh] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new ascii_command_decoder.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new cmd_token_pulser.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new ascii_uart_sensor_pipeline.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new context_manager.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new remote_input_unit.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new dht11.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new fnd_controller_dht11.v] \
@@ -36,8 +37,10 @@ set source_files [list \
 
 set sim_files [list \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 new tb_dht11_jm.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 new tb_remote_input_unit.v] \
-    [file join $repo_root wcfg tb_remote_input_unit_wave.wcfg] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 new tb_ascii_uart_sensor_pipeline.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 new tb_input_unit.v] \
+    [file join $repo_root wcfg tb_ascii_uart_sensor_pipeline_wave.wcfg] \
+    [file join $repo_root wcfg tb_input_unit_wave.wcfg] \
 ]
 
 set constraint_files [list \
@@ -49,8 +52,8 @@ add_files -fileset sources_1 $source_files
 add_files -fileset sim_1 $sim_files
 add_files -fileset constrs_1 $constraint_files
 
-set_property top remote_input_unit [get_filesets sources_1]
-set_property top tb_remote_input_unit [get_filesets sim_1]
+set_property top ascii_uart_sensor_pipeline [get_filesets sources_1]
+set_property top tb_input_unit [get_filesets sim_1]
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1

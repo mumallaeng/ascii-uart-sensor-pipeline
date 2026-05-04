@@ -63,8 +63,8 @@
 
 ### `sim_1`에 있어야 하는 파일
 
-- `sim_1/new/tb_remote_input_unit.v`
-- `wcfg/tb_remote_input_unit_wave.wcfg`
+- `sim_1/new/tb_input_unit.v`
+- `wcfg/tb_input_unit_wave.wcfg`
 
 ### `sources_1` top
 
@@ -72,7 +72,7 @@
 
 ### `sim_1` top
 
-- `tb_remote_input_unit`
+- `tb_input_unit`
 
 ## assistant용 작업 프롬프트
 

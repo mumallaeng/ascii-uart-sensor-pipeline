@@ -1,0 +1,143 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_input_unit_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl"/>
+            <top_module name="tb_input_unit"/>
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <wvobject type="logic" fp_name="/tb_input_unit/rst">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/btnR">
+      <obj_property name="ElementShortName">btnR</obj_property>
+      <obj_property name="ObjectShortName">btnR</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/btnC">
+      <obj_property name="ElementShortName">btnC</obj_property>
+      <obj_property name="ObjectShortName">btnC</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb_input_unit/sw_context">
+      <obj_property name="ElementShortName">sw_context[1:0]</obj_property>
+      <obj_property name="ObjectShortName">sw_context[1:0]</obj_property>
+      <obj_property name="Radix">BINARY</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/sw15">
+      <obj_property name="ElementShortName">sw15</obj_property>
+      <obj_property name="ObjectShortName">sw15</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/rx">
+      <obj_property name="ElementShortName">rx</obj_property>
+      <obj_property name="ObjectShortName">rx</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/o_btnR">
+      <obj_property name="ElementShortName">o_btnR</obj_property>
+      <obj_property name="ObjectShortName">o_btnR</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/o_btnR_hold">
+      <obj_property name="ElementShortName">o_btnR_hold</obj_property>
+      <obj_property name="ObjectShortName">o_btnR_hold</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/o_btnC">
+      <obj_property name="ElementShortName">o_btnC</obj_property>
+      <obj_property name="ObjectShortName">o_btnC</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb_input_unit/current_context">
+      <obj_property name="ElementShortName">current_context[1:0]</obj_property>
+      <obj_property name="ObjectShortName">current_context[1:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/context_change_pulse">
+      <obj_property name="ElementShortName">context_change_pulse</obj_property>
+      <obj_property name="ObjectShortName">context_change_pulse</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/watch_12h">
+      <obj_property name="ElementShortName">watch_12h</obj_property>
+      <obj_property name="ObjectShortName">watch_12h</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/dht11_show_humi">
+      <obj_property name="ElementShortName">dht11_show_humi</obj_property>
+      <obj_property name="ObjectShortName">dht11_show_humi</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/DUT_REMOTE_INPUT_UNIT/U_UART_RX_FIFO/o_ascii_byte_valid">
+      <obj_property name="ElementShortName">o_ascii_byte_valid</obj_property>
+      <obj_property name="ObjectShortName">o_ascii_byte_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb_input_unit/DUT_REMOTE_INPUT_UNIT/U_UART_RX_FIFO/o_ascii_byte">
+      <obj_property name="ElementShortName">o_ascii_byte[7:0]</obj_property>
+      <obj_property name="ObjectShortName">o_ascii_byte[7:0]</obj_property>
+      <obj_property name="Radix">ASCII</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb_input_unit/DUT_REMOTE_INPUT_UNIT/U_ASCII_COMMAND_PARSER/state_reg">
+      <obj_property name="ElementShortName">parser_state_reg[2:0]</obj_property>
+      <obj_property name="ObjectShortName">parser_state_reg[2:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb_input_unit/DUT_REMOTE_INPUT_UNIT/U_ASCII_COMMAND_PARSER/cmd_char_count_reg">
+      <obj_property name="ElementShortName">cmd_char_count_reg[3:0]</obj_property>
+      <obj_property name="ObjectShortName">cmd_char_count_reg[3:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/DUT_REMOTE_INPUT_UNIT/U_ASCII_COMMAND_PARSER/o_cmd_token_valid">
+      <obj_property name="ElementShortName">o_cmd_token_valid</obj_property>
+      <obj_property name="ObjectShortName">o_cmd_token_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb_input_unit/DUT_REMOTE_INPUT_UNIT/U_ASCII_COMMAND_PARSER/o_cmd_token_code">
+      <obj_property name="ElementShortName">o_cmd_token_code[3:0]</obj_property>
+      <obj_property name="ObjectShortName">o_cmd_token_code[3:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/DUT_REMOTE_INPUT_UNIT/U_CMD_TOKEN_PULSER/state_reg">
+      <obj_property name="ElementShortName">pulser_state_reg</obj_property>
+      <obj_property name="ObjectShortName">pulser_state_reg</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/cmd_btnR">
+      <obj_property name="ElementShortName">cmd_btnR</obj_property>
+      <obj_property name="ObjectShortName">cmd_btnR</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/cmd_status">
+      <obj_property name="ElementShortName">cmd_status</obj_property>
+      <obj_property name="ObjectShortName">cmd_status</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/unknown_cmd">
+      <obj_property name="ElementShortName">unknown_cmd</obj_property>
+      <obj_property name="ObjectShortName">unknown_cmd</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/seen_local_btnR">
+      <obj_property name="ElementShortName">seen_local_btnR</obj_property>
+      <obj_property name="ObjectShortName">seen_local_btnR</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/seen_local_btnR_hold">
+      <obj_property name="ElementShortName">seen_local_btnR_hold</obj_property>
+      <obj_property name="ObjectShortName">seen_local_btnR_hold</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/seen_local_btnC">
+      <obj_property name="ElementShortName">seen_local_btnC</obj_property>
+      <obj_property name="ObjectShortName">seen_local_btnC</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/seen_context_change">
+      <obj_property name="ElementShortName">seen_context_change</obj_property>
+      <obj_property name="ObjectShortName">seen_context_change</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/seen_remote_btnR">
+      <obj_property name="ElementShortName">seen_remote_btnR</obj_property>
+      <obj_property name="ObjectShortName">seen_remote_btnR</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/seen_remote_status">
+      <obj_property name="ElementShortName">seen_remote_status</obj_property>
+      <obj_property name="ObjectShortName">seen_remote_status</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_input_unit/seen_unknown_cmd">
+      <obj_property name="ElementShortName">seen_unknown_cmd</obj_property>
+      <obj_property name="ObjectShortName">seen_unknown_cmd</obj_property>
+   </wvobject>
+</wave_config>
