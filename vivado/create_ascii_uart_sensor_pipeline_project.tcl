@@ -20,7 +20,6 @@ set source_files [list \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports watch_stopwatch time_set_module.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports watch_stopwatch watch_datapath.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports watch_stopwatch watch_fsm.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports watch_stopwatch watch_stopwatch.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports 10000_counter button_debounce.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports uart uart.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports uart uart_rx.v] \
@@ -30,10 +29,8 @@ set source_files [list \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new ascii_uart_sensor_pipeline.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new context_manager.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new decision_unit.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new execute_unit.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new remote_input_unit.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new dht11.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new fnd_controller_dht11.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new sr04_controller.v] \
 ]
 
 set sim_files [list \
