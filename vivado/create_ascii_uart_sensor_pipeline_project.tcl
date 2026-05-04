@@ -20,24 +20,28 @@ set source_files [list \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports watch_stopwatch time_set_module.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports watch_stopwatch watch_datapath.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports watch_stopwatch watch_fsm.v] \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports 10000_counter button_debounce.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports uart uart.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports uart uart_rx.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 imports fifo fifo.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new ascii_uart_sensor_pipeline_defs.vh] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new ascii_log_formatter.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new cmd_token_pulser.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new ascii_uart_sensor_pipeline.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new context_manager.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new decision_unit.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new display_unit.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new log_byte_sender.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new execute_unit.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new remote_output_unit.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new remote_input_unit.v] \
 ]
 
 set sim_files [list \
-    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 new tb_dht11_jm.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 new tb_ascii_uart_sensor_pipeline.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 new tb_decision_unit.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 new tb_dht11_jm.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 new tb_input_unit.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 new tb_sr04.v] \
     [file join $repo_root wcfg tb_ascii_uart_sensor_pipeline_wave.wcfg] \
     [file join $repo_root wcfg tb_input_unit_wave.wcfg] \
 ]
@@ -52,7 +56,7 @@ add_files -fileset sim_1 $sim_files
 add_files -fileset constrs_1 $constraint_files
 
 set_property top ascii_uart_sensor_pipeline [get_filesets sources_1]
-set_property top tb_input_unit [get_filesets sim_1]
+set_property top tb_ascii_uart_sensor_pipeline [get_filesets sim_1]
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
