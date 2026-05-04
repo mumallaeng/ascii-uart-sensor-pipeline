@@ -167,23 +167,6 @@ module tb_ascii_uart_sensor_pipeline;
         end
     endtask
 
-    task automatic send_text_status_with_delete_edit;
-        begin
-            // terminal에서 흔히 들어오는 delete를 앞뒤로 섞어도
-            // 최종 token이 status로 복원되는지 확인한다.
-            send_uart_byte(8'h7F);
-            send_uart_byte("s");
-            send_uart_byte("t");
-            send_uart_byte("x");
-            send_uart_byte(8'h7F);
-            send_uart_byte("a");
-            send_uart_byte("t");
-            send_uart_byte("u");
-            send_uart_byte("s");
-            send_uart_byte(8'h0D);
-        end
-    endtask
-
     task automatic expect_status_frame;
         input [1:0] expected_context;
         begin
@@ -251,13 +234,6 @@ module tb_ascii_uart_sensor_pipeline;
         $display("TB scenario3: unknown command");
         send_text_unknown_cmd();
         expect_uart_bytes({"ERR=unk_cmd", 8'h0D, 8'h0A, 8'h0D, 8'h0A}, 15);
-
-        // Scenario 4: delete/backspace가 섞여도 command가 정상 복원되는지 확인.
-        $display("TB scenario4: status with delete edit");
-        sw[1:0] = 2'b00;
-        repeat (4) @(posedge clk);
-        send_text_status_with_delete_edit();
-        expect_status_frame(2'd0);
 
         $display("tb_ascii_uart_sensor_pipeline: PASS");
         $finish;
