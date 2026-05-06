@@ -29,6 +29,7 @@ set source_files [list \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new cmd_token_pulser.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new ascii_uart_sensor_pipeline.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new context_manager.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new decision_unit.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new remote_input_unit.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new dht11.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new fnd_controller_dht11.v] \
@@ -38,6 +39,7 @@ set source_files [list \
 set sim_files [list \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 new tb_dht11_jm.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 new tb_ascii_uart_sensor_pipeline.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 new tb_decision_unit.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sim_1 new tb_input_unit.v] \
     [file join $repo_root wcfg tb_ascii_uart_sensor_pipeline_wave.wcfg] \
     [file join $repo_root wcfg tb_input_unit_wave.wcfg] \

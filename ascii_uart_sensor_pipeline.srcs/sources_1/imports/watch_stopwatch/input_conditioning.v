@@ -31,10 +31,10 @@ module input_conditioning #(
     output o_sw15
 );
 
-    // Project note:
-    // - btnU/D/L/R keep the original watch_stopwatch short/hold semantics.
-    // - btnC is added as a project-level clear input and only uses short pulse.
-    // - sw0/sw15 pass-through stays for legacy watch_stopwatch compatibility.
+    // 프로젝트 메모:
+    // - btnU/D/L/R은 기존 watch_stopwatch short/hold 의미를 유지한다.
+    // - btnC는 프로젝트 공통 clear 입력으로 추가했고 short pulse만 쓴다.
+    // - sw0/sw15 pass-through는 legacy watch_stopwatch 호환을 위해 남겨 둔다.
     assign o_sw0  = sw0;
     assign o_sw15 = sw15;
 
@@ -90,8 +90,8 @@ module input_conditioning #(
         .o_btn_hold(o_btnR_hold)
     );
 
-    // btnC is intentionally short-pulse only. A very large HOLD_TIME keeps the
-    // debouncer from converting normal test/button use into hold behavior.
+    // btnC는 의도적으로 short-pulse only로 쓴다.
+    // HOLD_TIME를 매우 크게 잡아 일반 버튼 입력이 hold로 해석되지 않게 한다.
     debouncer #(
         .CLK_FREQ_HZ(CLK_FREQ_HZ),
         .BD_HZ(BD_HZ),

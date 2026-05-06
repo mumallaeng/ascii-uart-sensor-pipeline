@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
 
+`include "ascii_uart_sensor_pipeline_defs.vh"
+
 module ascii_uart_sensor_pipeline (
     input clk,
     input rst,
@@ -19,10 +21,11 @@ module ascii_uart_sensor_pipeline (
     output [2:0] led
 );
 
-    // Top-level integration skeleton.
-    // INPUT-stage direct children are instantiated here first.
-    // CONTROL / FUNCTION / OUTPUT blocks will be connected follow-up.
+    // 현재 top은 INPUT direct child와 decision_unit까지 연결된 상태다.
+    // FUNCTION / OUTPUT 통합은 후속 작업이므로,
+    // 최종 보드 출력은 파일 하단에서 안전한 기본값으로 묶어 둔다.
 
+    // INPUT 구간에서 정리된 local button/switch bundle.
     wire w_btnU;
     wire w_btnD;
     wire w_btnL;
@@ -35,11 +38,13 @@ module ascii_uart_sensor_pipeline (
     wire w_sw0;
     wire w_sw15;
 
+    // INPUT 구간 context decode 결과.
     wire [1:0] w_current_context;
     wire w_context_change_pulse;
     wire w_watch_12h;
     wire w_dht11_show_humi;
 
+    // INPUT 구간 remote command bundle.
     wire w_cmd_btnR;
     wire w_cmd_btnR_hold;
     wire w_cmd_btnL;
@@ -48,6 +53,27 @@ module ascii_uart_sensor_pipeline (
     wire w_cmd_status;
     wire w_cmd_clr;
     wire w_unknown_cmd;
+
+    // CONTROL 구간 decision 결과.
+    wire w_watch_display_toggle_pulse;
+    wire w_watch_set_mode_toggle_pulse;
+    wire w_watch_set_index_next_pulse;
+    wire w_watch_value_inc_pulse;
+    wire w_watch_value_inc_tens_pulse;
+    wire w_watch_value_dec_pulse;
+    wire w_watch_value_dec_tens_pulse;
+    wire w_stopwatch_display_toggle_pulse;
+    wire w_stopwatch_clear_pulse;
+    wire w_stopwatch_count_dir_toggle_pulse;
+    wire w_stopwatch_run_toggle_pulse;
+    wire w_soft_clear_pulse;
+    wire w_sr04_refresh_req;
+    wire w_dht11_refresh_req;
+    wire [`SRC_W-1:0] w_log_src;
+    wire [`CMD_W-1:0] w_log_cmd;
+    wire [`EVT_W-1:0] w_log_evt;
+    wire [`ACT_W-1:0] w_log_act;
+    wire w_log_req;
 
     input_conditioning U_INPUT_CONDITIONING (
         .clk(clk),
@@ -97,6 +123,50 @@ module ascii_uart_sensor_pipeline (
         .unknown_cmd(w_unknown_cmd)
     );
 
+    decision_unit U_DECISION_UNIT (
+        .clk(clk),
+        .rst(rst),
+        .i_btnU(w_btnU),
+        .i_btnD(w_btnD),
+        .i_btnL(w_btnL),
+        .i_btnR(w_btnR),
+        .i_btnC(w_btnC),
+        .i_btnU_hold(w_btnU_hold),
+        .i_btnD_hold(w_btnD_hold),
+        .i_btnL_hold(w_btnL_hold),
+        .i_btnR_hold(w_btnR_hold),
+        .i_cmd_btnR(w_cmd_btnR),
+        .i_cmd_btnR_hold(w_cmd_btnR_hold),
+        .i_cmd_btnL(w_cmd_btnL),
+        .i_cmd_btnU(w_cmd_btnU),
+        .i_cmd_btnD(w_cmd_btnD),
+        .i_cmd_status(w_cmd_status),
+        .i_cmd_clr(w_cmd_clr),
+        .i_current_context(w_current_context),
+        .i_context_change_pulse(w_context_change_pulse),
+        .o_watch_display_toggle_pulse(w_watch_display_toggle_pulse),
+        .o_watch_set_mode_toggle_pulse(w_watch_set_mode_toggle_pulse),
+        .o_watch_set_index_next_pulse(w_watch_set_index_next_pulse),
+        .o_watch_value_inc_pulse(w_watch_value_inc_pulse),
+        .o_watch_value_inc_tens_pulse(w_watch_value_inc_tens_pulse),
+        .o_watch_value_dec_pulse(w_watch_value_dec_pulse),
+        .o_watch_value_dec_tens_pulse(w_watch_value_dec_tens_pulse),
+        .o_stopwatch_display_toggle_pulse(w_stopwatch_display_toggle_pulse),
+        .o_stopwatch_clear_pulse(w_stopwatch_clear_pulse),
+        .o_stopwatch_count_dir_toggle_pulse(w_stopwatch_count_dir_toggle_pulse),
+        .o_stopwatch_run_toggle_pulse(w_stopwatch_run_toggle_pulse),
+        .o_soft_clear_pulse(w_soft_clear_pulse),
+        .o_sr04_refresh_req(w_sr04_refresh_req),
+        .o_dht11_refresh_req(w_dht11_refresh_req),
+        .o_log_src(w_log_src),
+        .o_log_cmd(w_log_cmd),
+        .o_log_evt(w_log_evt),
+        .o_log_act(w_log_act),
+        .o_log_req(w_log_req)
+    );
+
+    // function_unit/event_log_unit/display_unit이 붙기 전까지는
+    // 외부 출력들을 보드 안전 기본값으로 유지한다.
     assign tx = 1'b1;
     assign trig = 1'b0;
     assign fnd_com = 4'b1111;

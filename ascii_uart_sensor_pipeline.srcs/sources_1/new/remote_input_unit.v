@@ -16,7 +16,7 @@ module remote_input_unit (
     output unknown_cmd
 );
 
-    // Remote RX path:
+    // Remote RX 경로:
     // serial rx -> uart_rx_fifo -> ascii_command_parser -> cmd_token_pulser
     wire ascii_byte_valid;
     wire [7:0] ascii_byte;
@@ -75,7 +75,8 @@ module uart_rx_fifo #(
     wire [7:0] fifo_pop_data;
     wire fifo_pop;
 
-    // Present a simple ASCII-byte-valid stream to downstream logic.
+    // downstream에서는 "ASCII byte + valid"만 보면 되도록
+    // FIFO를 단순한 stream 형태로 노출한다.
     assign fifo_pop = !fifo_empty;
     assign o_ascii_byte_valid = !fifo_empty;
     assign o_ascii_byte = fifo_pop_data;
@@ -122,7 +123,7 @@ module ascii_command_parser #(
     output reg o_unknown_token
 );
 
-    // FSM matched to the design docs:
+    // 설계 문서에 맞춘 FSM:
     // IDLE -> COLLECT -> DECODE -> OUTPUT -> IDLE
     //                            \-> ERROR  -> IDLE
     localparam [2:0] IDLE = 3'd0;
@@ -257,7 +258,7 @@ module ascii_command_parser #(
                 cmd_char_count_next = 4'd0;
                 cmd_token_code_next = `CMD_NONE;
                 if (i_ascii_byte_valid && !is_delimiter(i_ascii_byte)) begin
-                    // First ASCII byte of a new command string.
+                    // 새 command 문자열의 첫 글자.
                     cmd_chars_next[0] = i_ascii_byte;
                     cmd_char_count_next = 4'd1;
                     state_next = COLLECT;
@@ -267,21 +268,21 @@ module ascii_command_parser #(
             COLLECT: begin
                 if (i_ascii_byte_valid) begin
                     if (is_delimiter(i_ascii_byte)) begin
-                        // CR/LF ends one command token.
+                        // CR/LF가 command token의 끝을 뜻한다.
                         state_next = DECODE;
                     end else if (cmd_char_count_reg < MAX_CMD_CHARS) begin
-                        // Keep collecting command characters.
+                        // 아직 끝 문자가 아니므로 계속 모은다.
                         cmd_chars_next[cmd_char_count_reg] = i_ascii_byte;
                         cmd_char_count_next = cmd_char_count_reg + 1'b1;
                     end else begin
-                        // Too long: reject this token.
+                        // 너무 길면 이번 token은 에러로 버린다.
                         state_next = ERROR;
                     end
                 end
             end
 
             DECODE: begin
-                // Normalize full strings and one-char aliases into CMD_* codes.
+                // full string과 1글자 alias를 모두 CMD_* code로 정규화한다.
                 if (match_btnR(cmd_char_count_reg, cmd_chars_reg[0], cmd_chars_reg[1], cmd_chars_reg[2], cmd_chars_reg[3])) begin
                     cmd_token_code_next = `CMD_BTNR;
                     state_next = OUTPUT;
@@ -320,14 +321,14 @@ module ascii_command_parser #(
             end
 
             OUTPUT: begin
-                // One-cycle canonical command-token pulse toward cmd_token_pulser.
+                // cmd_token_pulser 쪽으로 1-cycle canonical token pulse를 보낸다.
                 o_cmd_token_valid = 1'b1;
                 o_cmd_token_code = cmd_token_code_reg;
                 state_next = IDLE;
             end
 
             ERROR: begin
-                // Keep error reporting separate from valid token output.
+                // 정상 token 출력과 에러 보고는 분리한다.
                 o_unknown_token = 1'b1;
                 state_next = IDLE;
             end
