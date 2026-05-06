@@ -6,7 +6,7 @@ module sr04_fnd_controller #(
 ) (
     input clk,
     input rst,
-    input [13:0] fnd_in,
+    input [11:0] i_distance_mm,
     output [3:0] fnd_com,
     output [7:0] fnd_data
 );
@@ -17,7 +17,7 @@ module sr04_fnd_controller #(
     wire w_scan_tick;
 
     sr04_digit_splitter U_DIGIT_SPLIT (
-        .digit_in(fnd_in),
+        .digit_in({2'b00, i_distance_mm}),
         .digit_1(w_digit_1),
         .digit_10(w_digit_10),
         .digit_100(w_digit_100),
@@ -37,6 +37,7 @@ module sr04_fnd_controller #(
 
     sr04_bcd U_BCD (
         .bin(w_out_mux),
+        .i_decimal_enable(w_digit_sel == 2'b01),
         .bcd_data(fnd_data)
     );
 
@@ -185,10 +186,11 @@ endmodule
 
 module sr04_bcd (
     input [3:0] bin,
+    input i_decimal_enable,
     output reg [7:0] bcd_data
 );
 
-    always @(bin) begin
+    always @(*) begin
         case (bin)
             4'b0000: bcd_data = 8'hC0;
             4'b0001: bcd_data = 8'hF9;
@@ -208,6 +210,12 @@ module sr04_bcd (
             4'b1111: bcd_data = 8'h8E;
             default: bcd_data = 8'hFF;
         endcase
+
+        // mm latest 값을 4자리로 들고 있고, FND에서는 cm 소수 1자리처럼 보이게 한다.
+        // 예: 1234(mm) -> "123.4"
+        if (i_decimal_enable) begin
+            bcd_data[7] = 1'b0;
+        end
     end
 
 endmodule

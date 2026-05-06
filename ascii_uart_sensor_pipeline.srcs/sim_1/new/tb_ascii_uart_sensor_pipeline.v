@@ -5,8 +5,9 @@
 // 한 번에 묶은 상태에서 top 외부 관찰 결과만 본다.
 //
 // 주의:
-// - SR04/DHT11 최신 payload는 아직 placeholder wrapper 기준이라
-//   이 TB에서는 sensor 값의 "정확한 숫자"까지 비교하지 않는다.
+// - 센서 latest value 자체는 실제 측정 타이밍 영향을 받으므로
+//   이 TB에서는 sensor 값의 "정확한 숫자"보다
+//   응답 프레임 구조와 context별 경로가 맞는지를 우선 본다.
 // - 대신 `SR04=` / `DHT11=` 줄이 정상적으로 나오고,
 //   context/메타 라인이 기대대로 이어지는지만 본다.
 module tb_ascii_uart_sensor_pipeline;
@@ -291,7 +292,9 @@ module tb_ascii_uart_sensor_pipeline;
     endtask
 
     initial begin
-        #(BIT_PERIOD_NS * 8000);
+        // DHT11 시나리오가 30ms 이상 대기하므로
+        // top integration TB 전체 timeout은 그보다 충분히 크게 둔다.
+        #80_000_000;
         $fatal(1, "tb_ascii_uart_sensor_pipeline timeout");
     end
 

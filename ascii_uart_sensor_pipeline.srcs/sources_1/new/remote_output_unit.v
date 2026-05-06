@@ -22,9 +22,13 @@ module remote_output_unit #(
     input [4:0] i_stopwatch_hour,
     input [5:0] i_stopwatch_min,
     input [5:0] i_stopwatch_sec,
-    input [8:0] i_sr04_distance_cm,
+    input [11:0] i_sr04_distance_mm,
     input [7:0] i_dht_temp,
+    input [7:0] i_dht_temp_frac,
     input [7:0] i_dht_humi,
+    input [7:0] i_dht_humi_frac,
+    input i_dht_show_humi,
+    input i_dht_show_fahrenheit,
     input i_dht_valid,
     output o_tx
 );
@@ -40,9 +44,13 @@ module remote_output_unit #(
     wire [4:0] w_collect_stopwatch_hour;
     wire [5:0] w_collect_stopwatch_min;
     wire [5:0] w_collect_stopwatch_sec;
-    wire [8:0] w_collect_sr04_distance_cm;
+    wire [11:0] w_collect_sr04_distance_mm;
     wire [7:0] w_collect_dht_temp;
+    wire [7:0] w_collect_dht_temp_frac;
     wire [7:0] w_collect_dht_humi;
+    wire [7:0] w_collect_dht_humi_frac;
+    wire w_collect_dht_show_humi;
+    wire w_collect_dht_show_fahrenheit;
     wire w_collect_dht_valid;
 
     reg r_pending_valid;
@@ -56,9 +64,13 @@ module remote_output_unit #(
     reg [4:0] r_pending_stopwatch_hour;
     reg [5:0] r_pending_stopwatch_min;
     reg [5:0] r_pending_stopwatch_sec;
-    reg [8:0] r_pending_sr04_distance_cm;
+    reg [11:0] r_pending_sr04_distance_mm;
     reg [7:0] r_pending_dht_temp;
+    reg [7:0] r_pending_dht_temp_frac;
     reg [7:0] r_pending_dht_humi;
+    reg [7:0] r_pending_dht_humi_frac;
+    reg r_pending_dht_show_humi;
+    reg r_pending_dht_show_fahrenheit;
     reg r_pending_dht_valid;
 
     reg r_active_unknown_cmd;
@@ -71,9 +83,13 @@ module remote_output_unit #(
     reg [4:0] r_active_stopwatch_hour;
     reg [5:0] r_active_stopwatch_min;
     reg [5:0] r_active_stopwatch_sec;
-    reg [8:0] r_active_sr04_distance_cm;
+    reg [11:0] r_active_sr04_distance_mm;
     reg [7:0] r_active_dht_temp;
+    reg [7:0] r_active_dht_temp_frac;
     reg [7:0] r_active_dht_humi;
+    reg [7:0] r_active_dht_humi_frac;
+    reg r_active_dht_show_humi;
+    reg r_active_dht_show_fahrenheit;
     reg r_active_dht_valid;
 
     wire [7:0] w_frame_byte;
@@ -95,9 +111,13 @@ module remote_output_unit #(
         .i_stopwatch_hour(i_stopwatch_hour),
         .i_stopwatch_min(i_stopwatch_min),
         .i_stopwatch_sec(i_stopwatch_sec),
-        .i_sr04_distance_cm(i_sr04_distance_cm),
+        .i_sr04_distance_mm(i_sr04_distance_mm),
         .i_dht_temp(i_dht_temp),
+        .i_dht_temp_frac(i_dht_temp_frac),
         .i_dht_humi(i_dht_humi),
+        .i_dht_humi_frac(i_dht_humi_frac),
+        .i_dht_show_humi(i_dht_show_humi),
+        .i_dht_show_fahrenheit(i_dht_show_fahrenheit),
         .i_dht_valid(i_dht_valid),
         .o_collect_req(w_collect_req),
         .o_unknown_cmd(w_collect_unknown_cmd),
@@ -110,9 +130,13 @@ module remote_output_unit #(
         .o_stopwatch_hour(w_collect_stopwatch_hour),
         .o_stopwatch_min(w_collect_stopwatch_min),
         .o_stopwatch_sec(w_collect_stopwatch_sec),
-        .o_sr04_distance_cm(w_collect_sr04_distance_cm),
+        .o_sr04_distance_mm(w_collect_sr04_distance_mm),
         .o_dht_temp(w_collect_dht_temp),
+        .o_dht_temp_frac(w_collect_dht_temp_frac),
         .o_dht_humi(w_collect_dht_humi),
+        .o_dht_humi_frac(w_collect_dht_humi_frac),
+        .o_dht_show_humi(w_collect_dht_show_humi),
+        .o_dht_show_fahrenheit(w_collect_dht_show_fahrenheit),
         .o_dht_valid(w_collect_dht_valid)
     );
 
@@ -135,9 +159,13 @@ module remote_output_unit #(
             r_pending_stopwatch_hour <= 5'd0;
             r_pending_stopwatch_min <= 6'd0;
             r_pending_stopwatch_sec <= 6'd0;
-            r_pending_sr04_distance_cm <= 9'd0;
+            r_pending_sr04_distance_mm <= 12'd0;
             r_pending_dht_temp <= 8'd0;
+            r_pending_dht_temp_frac <= 8'd0;
             r_pending_dht_humi <= 8'd0;
+            r_pending_dht_humi_frac <= 8'd0;
+            r_pending_dht_show_humi <= 1'b0;
+            r_pending_dht_show_fahrenheit <= 1'b0;
             r_pending_dht_valid <= 1'b0;
             r_active_unknown_cmd <= 1'b0;
             r_active_src <= `SRC_LOCAL;
@@ -149,9 +177,13 @@ module remote_output_unit #(
             r_active_stopwatch_hour <= 5'd0;
             r_active_stopwatch_min <= 6'd0;
             r_active_stopwatch_sec <= 6'd0;
-            r_active_sr04_distance_cm <= 9'd0;
+            r_active_sr04_distance_mm <= 12'd0;
             r_active_dht_temp <= 8'd0;
+            r_active_dht_temp_frac <= 8'd0;
             r_active_dht_humi <= 8'd0;
+            r_active_dht_humi_frac <= 8'd0;
+            r_active_dht_show_humi <= 1'b0;
+            r_active_dht_show_fahrenheit <= 1'b0;
             r_active_dht_valid <= 1'b0;
         end else if (!r_pending_valid && w_collect_req) begin
             r_pending_valid <= 1'b1;
@@ -165,9 +197,13 @@ module remote_output_unit #(
             r_pending_stopwatch_hour <= w_collect_stopwatch_hour;
             r_pending_stopwatch_min <= w_collect_stopwatch_min;
             r_pending_stopwatch_sec <= w_collect_stopwatch_sec;
-            r_pending_sr04_distance_cm <= w_collect_sr04_distance_cm;
+            r_pending_sr04_distance_mm <= w_collect_sr04_distance_mm;
             r_pending_dht_temp <= w_collect_dht_temp;
+            r_pending_dht_temp_frac <= w_collect_dht_temp_frac;
             r_pending_dht_humi <= w_collect_dht_humi;
+            r_pending_dht_humi_frac <= w_collect_dht_humi_frac;
+            r_pending_dht_show_humi <= w_collect_dht_show_humi;
+            r_pending_dht_show_fahrenheit <= w_collect_dht_show_fahrenheit;
             r_pending_dht_valid <= w_collect_dht_valid;
         end else if (w_sender_start) begin
             r_pending_valid <= 1'b0;
@@ -181,9 +217,13 @@ module remote_output_unit #(
             r_active_stopwatch_hour <= r_pending_stopwatch_hour;
             r_active_stopwatch_min <= r_pending_stopwatch_min;
             r_active_stopwatch_sec <= r_pending_stopwatch_sec;
-            r_active_sr04_distance_cm <= r_pending_sr04_distance_cm;
+            r_active_sr04_distance_mm <= r_pending_sr04_distance_mm;
             r_active_dht_temp <= r_pending_dht_temp;
+            r_active_dht_temp_frac <= r_pending_dht_temp_frac;
             r_active_dht_humi <= r_pending_dht_humi;
+            r_active_dht_humi_frac <= r_pending_dht_humi_frac;
+            r_active_dht_show_humi <= r_pending_dht_show_humi;
+            r_active_dht_show_fahrenheit <= r_pending_dht_show_fahrenheit;
             r_active_dht_valid <= r_pending_dht_valid;
         end
     end
@@ -203,9 +243,13 @@ module remote_output_unit #(
         .i_stopwatch_hour(r_active_stopwatch_hour),
         .i_stopwatch_min(r_active_stopwatch_min),
         .i_stopwatch_sec(r_active_stopwatch_sec),
-        .i_sr04_distance_cm(r_active_sr04_distance_cm),
+        .i_sr04_distance_mm(r_active_sr04_distance_mm),
         .i_dht_temp(r_active_dht_temp),
+        .i_dht_temp_frac(r_active_dht_temp_frac),
         .i_dht_humi(r_active_dht_humi),
+        .i_dht_humi_frac(r_active_dht_humi_frac),
+        .i_dht_show_humi(r_active_dht_show_humi),
+        .i_dht_show_fahrenheit(r_active_dht_show_fahrenheit),
         .i_dht_valid(r_active_dht_valid),
         .o_frame_byte(w_frame_byte),
         .o_frame_len(w_frame_len)
@@ -242,9 +286,13 @@ module log_entry_collector (
     input [4:0] i_stopwatch_hour,
     input [5:0] i_stopwatch_min,
     input [5:0] i_stopwatch_sec,
-    input [8:0] i_sr04_distance_cm,
+    input [11:0] i_sr04_distance_mm,
     input [7:0] i_dht_temp,
+    input [7:0] i_dht_temp_frac,
     input [7:0] i_dht_humi,
+    input [7:0] i_dht_humi_frac,
+    input i_dht_show_humi,
+    input i_dht_show_fahrenheit,
     input i_dht_valid,
     output o_collect_req,
     output o_unknown_cmd,
@@ -257,9 +305,13 @@ module log_entry_collector (
     output [4:0] o_stopwatch_hour,
     output [5:0] o_stopwatch_min,
     output [5:0] o_stopwatch_sec,
-    output [8:0] o_sr04_distance_cm,
+    output [11:0] o_sr04_distance_mm,
     output [7:0] o_dht_temp,
+    output [7:0] o_dht_temp_frac,
     output [7:0] o_dht_humi,
+    output [7:0] o_dht_humi_frac,
+    output o_dht_show_humi,
+    output o_dht_show_fahrenheit,
     output o_dht_valid
 );
 
@@ -274,9 +326,13 @@ module log_entry_collector (
     assign o_stopwatch_hour = i_stopwatch_hour;
     assign o_stopwatch_min = i_stopwatch_min;
     assign o_stopwatch_sec = i_stopwatch_sec;
-    assign o_sr04_distance_cm = i_sr04_distance_cm;
+    assign o_sr04_distance_mm = i_sr04_distance_mm;
     assign o_dht_temp = i_dht_temp;
+    assign o_dht_temp_frac = i_dht_temp_frac;
     assign o_dht_humi = i_dht_humi;
+    assign o_dht_humi_frac = i_dht_humi_frac;
+    assign o_dht_show_humi = i_dht_show_humi;
+    assign o_dht_show_fahrenheit = i_dht_show_fahrenheit;
     assign o_dht_valid = i_dht_valid;
 
 endmodule

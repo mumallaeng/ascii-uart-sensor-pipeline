@@ -22,7 +22,9 @@ module tb_decision_unit;
     reg i_cmd_btnR_hold;
     reg i_cmd_btnL;
     reg i_cmd_btnU;
+    reg i_cmd_btnU_hold;
     reg i_cmd_btnD;
+    reg i_cmd_btnD_hold;
     reg i_cmd_status;
     reg i_cmd_clr;
     reg [`CTX_W-1:0] i_current_context;
@@ -64,7 +66,9 @@ module tb_decision_unit;
         .i_cmd_btnR_hold(i_cmd_btnR_hold),
         .i_cmd_btnL(i_cmd_btnL),
         .i_cmd_btnU(i_cmd_btnU),
+        .i_cmd_btnU_hold(i_cmd_btnU_hold),
         .i_cmd_btnD(i_cmd_btnD),
+        .i_cmd_btnD_hold(i_cmd_btnD_hold),
         .i_cmd_status(i_cmd_status),
         .i_cmd_clr(i_cmd_clr),
         .i_current_context(i_current_context),
@@ -107,7 +111,9 @@ module tb_decision_unit;
             i_cmd_btnR_hold = 1'b0;
             i_cmd_btnL = 1'b0;
             i_cmd_btnU = 1'b0;
+            i_cmd_btnU_hold = 1'b0;
             i_cmd_btnD = 1'b0;
+            i_cmd_btnD_hold = 1'b0;
             i_cmd_status = 1'b0;
             i_cmd_clr = 1'b0;
             i_context_change_pulse = 1'b0;
@@ -186,7 +192,20 @@ module tb_decision_unit;
         if (o_log_evt !== `EVT_BTNU_SHORT) $fatal(1, "expected EVT_BTNU_SHORT");
         expect_no_refresh_reqs();
 
-        // Check 3: remote clr는 soft_clear pulse와 remote log를 만들어야 한다.
+        // Check 3: remote btnU_hold도 tens increment로 해석돼야 한다.
+        clear_inputs();
+        i_current_context = `CTX_WATCH;
+        i_cmd_btnU_hold = 1'b1;
+        #1;
+        if (o_watch_value_inc_tens_pulse !== 1'b1) $fatal(1, "expected remote watch inc tens pulse");
+        if (o_watch_value_inc_pulse !== 1'b0) $fatal(1, "unexpected remote watch inc ones pulse");
+        if (o_log_src !== `SRC_REMOTE) $fatal(1, "expected remote src for btnU_hold");
+        if (o_log_cmd !== `CMD_BTNU_HOLD) $fatal(1, "expected CMD_BTNU_HOLD");
+        if (o_log_evt !== `EVT_BTNU_SHORT) $fatal(1, "expected EVT_BTNU_SHORT for remote hold");
+        if (o_log_act !== `ACT_WATCH_VALUE_INC_TENS) $fatal(1, "expected ACT_WATCH_VALUE_INC_TENS for remote hold");
+        expect_no_refresh_reqs();
+
+        // Check 4: remote clr는 soft_clear pulse와 remote log를 만들어야 한다.
         clear_inputs();
         i_current_context = `CTX_WATCH;
         i_cmd_clr = 1'b1;
@@ -199,7 +218,7 @@ module tb_decision_unit;
         if (o_log_req !== 1'b1) $fatal(1, "missing log_req for clr");
         expect_no_refresh_reqs();
 
-        // Check 4: STOPWATCH에서 btnD short는 run toggle이다.
+        // Check 5: STOPWATCH에서 btnD short는 run toggle이다.
         clear_inputs();
         i_current_context = `CTX_STOPWATCH;
         i_btnD = 1'b1;
@@ -208,7 +227,7 @@ module tb_decision_unit;
         if (o_log_act !== `ACT_STOPWATCH_RUN_TOGGLE) $fatal(1, "expected ACT_STOPWATCH_RUN_TOGGLE");
         expect_no_refresh_reqs();
 
-        // Check 5: SR04 context 진입은 refresh_req 1회와 refresh log를 만든다.
+        // Check 6: SR04 context 진입은 refresh_req 1회와 refresh log를 만든다.
         clear_inputs();
         i_current_context = `CTX_SR04;
         i_context_change_pulse = 1'b1;
@@ -220,7 +239,7 @@ module tb_decision_unit;
         if (o_log_act !== `ACT_REFRESH_REQUEST) $fatal(1, "expected refresh log act for sr04");
         if (o_log_req !== 1'b0) $fatal(1, "auto refresh should not raise log_req yet");
 
-        // Check 6: DHT11 context 진입도 별도 refresh_req를 만들어야 한다.
+        // Check 7: DHT11 context 진입도 별도 refresh_req를 만들어야 한다.
         clear_inputs();
         i_current_context = `CTX_DHT11;
         i_context_change_pulse = 1'b1;
@@ -232,7 +251,7 @@ module tb_decision_unit;
         if (o_log_act !== `ACT_REFRESH_REQUEST) $fatal(1, "expected refresh log act for dht11");
         if (o_log_req !== 1'b0) $fatal(1, "auto refresh should not raise log_req yet");
 
-        // Check 7: sensor context에서 btnR 계열 command는 기능 동작 없이 ignore log만 남긴다.
+        // Check 8: sensor context에서 btnR 계열 command는 기능 동작 없이 ignore log만 남긴다.
         clear_inputs();
         i_current_context = `CTX_SR04;
         i_cmd_btnR = 1'b1;
@@ -245,7 +264,7 @@ module tb_decision_unit;
         if (o_log_act !== `ACT_IGNORED_IN_SENSOR_CONTEXT) $fatal(1, "expected sensor ignore act");
         if (o_log_req !== 1'b1) $fatal(1, "ignored sensor command should still request log");
 
-        // Check 8: status는 context와 무관하게 status_report로 기록돼야 한다.
+        // Check 9: status는 context와 무관하게 status_report로 기록돼야 한다.
         clear_inputs();
         i_current_context = `CTX_DHT11;
         i_cmd_status = 1'b1;

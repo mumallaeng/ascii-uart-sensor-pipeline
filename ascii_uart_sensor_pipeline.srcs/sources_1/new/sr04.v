@@ -6,7 +6,7 @@ module sr04_unit (
     input i_refresh_req,
     input echo,
     output trig,
-    output [8:0] o_distance_cm,
+    output [11:0] o_distance_mm,
     output [3:0] o_fnd_com,
     output [7:0] o_fnd_data
 );
@@ -20,13 +20,13 @@ module sr04_unit (
         .tick_us(w_tick_us),
         .echo(echo),
         .trig(trig),
-        .o_distance_cm(o_distance_cm)
+        .o_distance_mm(o_distance_mm)
     );
 
     sr04_fnd_controller U_FND_CNTL (
         .clk(clk),
         .rst(rst),
-        .fnd_in({5'b00000, o_distance_cm}),
+        .i_distance_mm(o_distance_mm),
         .fnd_com(o_fnd_com),
         .fnd_data(o_fnd_data)
     );
@@ -46,7 +46,7 @@ module sr04_controller (
     input tick_us,
     input echo,
     output trig,
-    output [8:0] o_distance_cm
+    output [11:0] o_distance_mm
 );
 
     localparam [1:0] IDLE = 2'd0;
@@ -63,14 +63,14 @@ module sr04_controller (
     reg [TRIG_COUNT_WIDTH-1:0] trig_cnt_reg, trig_cnt_next;
     reg [ECHO_COUNT_WIDTH-1:0] echo_wait_cnt_reg, echo_wait_cnt_next;
     reg [ECHO_COUNT_WIDTH-1:0] echo_high_cnt_reg, echo_high_cnt_next;
-    reg [8:0] distance_reg, distance_next;
+    reg [11:0] distance_reg, distance_next;
     reg echo_sync_ff0, echo_sync_ff1;
 
     wire echo_sync;
 
     assign echo_sync = echo_sync_ff1;
     assign trig = (c_state == START);
-    assign distance = distance_reg;
+    assign o_distance_mm = distance_reg;
 
     always @(posedge clk or posedge rst) begin
         if (rst) begin
@@ -88,7 +88,7 @@ module sr04_controller (
             trig_cnt_reg      <= {TRIG_COUNT_WIDTH{1'b0}};
             echo_wait_cnt_reg <= {ECHO_COUNT_WIDTH{1'b0}};
             echo_high_cnt_reg <= {ECHO_COUNT_WIDTH{1'b0}};
-            distance_reg      <= 9'd0;
+            distance_reg      <= 12'd0;
         end else begin
             c_state           <= n_state;
             trig_cnt_reg      <= trig_cnt_next;
@@ -140,11 +140,11 @@ module sr04_controller (
             end
             RESPONSE: begin
                 if (!echo_sync) begin
-                    distance_next = echo_high_cnt_reg / 58;
+                    distance_next = (echo_high_cnt_reg * 10) / 58;
                     n_state = IDLE;
                 end else if (tick_us) begin
                     if (echo_high_cnt_reg == ECHO_TIMEOUT_US - 1) begin
-                        distance_next = echo_high_cnt_reg / 58;
+                        distance_next = (echo_high_cnt_reg * 10) / 58;
                         n_state = IDLE;
                     end else begin
                         echo_high_cnt_next = echo_high_cnt_reg + 1'b1;

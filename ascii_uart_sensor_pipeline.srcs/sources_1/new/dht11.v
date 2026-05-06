@@ -5,10 +5,13 @@ module dht11_unit (
     input rst,
     input i_refresh_req,
     input i_show_humi,
+    input i_show_fahrenheit,
     inout dht11_io,
 
     output [7:0] o_temp,
+    output [7:0] o_temp_frac,
     output [7:0] o_humi,
+    output [7:0] o_humi_frac,
     output       o_valid,
     output [3:0] o_fnd_com,
     output [7:0] o_fnd_data
@@ -16,18 +19,23 @@ module dht11_unit (
 
 
     wire w_tick_us, w_valid;
-    wire [7:0] w_humi, w_temp;
+    wire [7:0] w_humi, w_humi_frac, w_temp, w_temp_frac;
 
     assign o_temp = w_temp;
+    assign o_temp_frac = w_temp_frac;
     assign o_humi = w_humi;
+    assign o_humi_frac = w_humi_frac;
     assign o_valid = w_valid;
 
     dht11_fnd_controller U_FND_CNTL (
         .clk     (clk),
         .rst     (rst),
-        .sw15    (i_show_humi),
-        .tm      (w_temp),
-        .hm      (w_humi),
+        .i_show_humi(i_show_humi),
+        .i_show_fahrenheit(i_show_fahrenheit),
+        .i_temp_int (w_temp),
+        .i_temp_frac(w_temp_frac),
+        .i_humi_int (w_humi),
+        .i_humi_frac(w_humi_frac),
         .fnd_com (o_fnd_com),
         .fnd_data(o_fnd_data)
     );
@@ -37,8 +45,10 @@ module dht11_unit (
         .rst        (rst),
         .dht11_start(i_refresh_req),
         .tick_us    (w_tick_us),
-        .humidity   (w_humi),
-        .temperature(w_temp),
+        .humidity_int (w_humi),
+        .humidity_frac(w_humi_frac),
+        .temperature_int(w_temp),
+        .temperature_frac(w_temp_frac),
         .valid      (w_valid),
         // valid가 1이면 led ON / check sum 확인
         .dht11      (dht11_io)
@@ -57,8 +67,10 @@ module dht11_controller (
     input        rst,
     input        dht11_start,
     input        tick_us,
-    output [7:0] humidity,
-    output [7:0] temperature,
+    output [7:0] humidity_int,
+    output [7:0] humidity_frac,
+    output [7:0] temperature_int,
+    output [7:0] temperature_frac,
     output       valid,        // valid가 1이면 led ON / check sum 확인
     inout        dht11
 );
@@ -83,8 +95,10 @@ module dht11_controller (
 
     assign valid = (data_reg[7:0] == (data_reg[39:32] + data_reg[31:24] + data_reg [23:16] + data_reg[15:8])) ? 1:0;
 
-    assign humidity = data_reg[39:32];
-    assign temperature = data_reg[23:16];
+    assign humidity_int = data_reg[39:32];
+    assign humidity_frac = data_reg[31:24];
+    assign temperature_int = data_reg[23:16];
+    assign temperature_frac = data_reg[15:8];
 
     always @(posedge clk, posedge rst) begin
         if (rst) begin
@@ -151,7 +165,7 @@ module dht11_controller (
                 // output is high impedance "z"
                 out_sel_next = 1'b0;
                 if (tick_us) begin
-                    if ((tick_cnt_reg > 40) && (dht11)) begin
+                    if ((tick_cnt_reg > 40) && (dht11_sync2)) begin
                         tick_cnt_next = 0;
                         n_state = SYNCH;
                     end else begin
@@ -161,7 +175,7 @@ module dht11_controller (
             end
             SYNCH: begin
                 if (tick_us) begin
-                    if ((tick_cnt_reg > 40) && (!dht11)) begin
+                    if ((tick_cnt_reg > 40) && (!dht11_sync2)) begin
                         tick_cnt_next = 0;
                         n_state = DATA_SYNC;
                     end else begin

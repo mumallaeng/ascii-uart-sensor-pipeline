@@ -22,7 +22,9 @@ module decision_unit (
     input i_cmd_btnR_hold,
     input i_cmd_btnL,
     input i_cmd_btnU,
+    input i_cmd_btnU_hold,
     input i_cmd_btnD,
+    input i_cmd_btnD_hold,
     input i_cmd_status,
     input i_cmd_clr,
     input [`CTX_W-1:0] i_current_context,
@@ -73,7 +75,9 @@ module decision_unit (
         .i_cmd_btnR_hold(i_cmd_btnR_hold),
         .i_cmd_btnL(i_cmd_btnL),
         .i_cmd_btnU(i_cmd_btnU),
+        .i_cmd_btnU_hold(i_cmd_btnU_hold),
         .i_cmd_btnD(i_cmd_btnD),
+        .i_cmd_btnD_hold(i_cmd_btnD_hold),
         .i_cmd_status(i_cmd_status),
         .i_cmd_clr(i_cmd_clr),
         .o_canonical_evt_valid(w_canonical_evt_valid),
@@ -131,7 +135,9 @@ module event_selector (
     input i_cmd_btnR_hold,
     input i_cmd_btnL,
     input i_cmd_btnU,
+    input i_cmd_btnU_hold,
     input i_cmd_btnD,
+    input i_cmd_btnD_hold,
     input i_cmd_status,
     input i_cmd_clr,
     output reg o_canonical_evt_valid,
@@ -211,11 +217,23 @@ module event_selector (
             o_canonical_src = `SRC_REMOTE;
             o_canonical_cmd = `CMD_BTNU;
             o_canonical_evt = `EVT_BTNU_SHORT;
+        end else if (i_cmd_btnU_hold) begin
+            o_canonical_evt_valid = 1'b1;
+            o_canonical_src = `SRC_REMOTE;
+            o_canonical_cmd = `CMD_BTNU_HOLD;
+            o_canonical_evt = `EVT_BTNU_SHORT;
+            o_canonical_step_tens = 1'b1;
         end else if (i_cmd_btnD) begin
             o_canonical_evt_valid = 1'b1;
             o_canonical_src = `SRC_REMOTE;
             o_canonical_cmd = `CMD_BTND;
             o_canonical_evt = `EVT_BTND_SHORT;
+        end else if (i_cmd_btnD_hold) begin
+            o_canonical_evt_valid = 1'b1;
+            o_canonical_src = `SRC_REMOTE;
+            o_canonical_cmd = `CMD_BTND_HOLD;
+            o_canonical_evt = `EVT_BTND_SHORT;
+            o_canonical_step_tens = 1'b1;
         end else if (i_cmd_status) begin
             o_canonical_evt_valid = 1'b1;
             o_canonical_src = `SRC_REMOTE;

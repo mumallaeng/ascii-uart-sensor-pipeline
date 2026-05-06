@@ -3,14 +3,14 @@
 `include "ascii_uart_sensor_pipeline_defs.vh"
 
 // execute_unit은 decision 결과를 실제 기능 블록 경계로 넘기는 wrapper다.
-// 현재 단계에서는 watch/stopwatch만 먼저 연결하고,
-// SR04/DHT11은 팀원 요청 문서 기준으로 후속 연동한다.
+// watch/stopwatch와 sensor 모두 여기서 최종 실행 경계로 정리한다.
 module execute_unit (
     input clk,
     input rst,
     input [`CTX_W-1:0] i_current_context,
     input i_watch_12h,
     input i_dht11_show_humi,
+    input i_dht11_show_fahrenheit,
     input i_watch_display_toggle_pulse,
     input i_watch_set_mode_toggle_pulse,
     input i_watch_set_index_next_pulse,
@@ -42,9 +42,11 @@ module execute_unit (
     output [7:0] o_sr04_fnd_data,
     output [3:0] o_dht11_fnd_com,
     output [7:0] o_dht11_fnd_data,
-    output [8:0] o_sr04_distance_cm,
+    output [11:0] o_sr04_distance_mm,
     output [7:0] o_dht11_temp,
+    output [7:0] o_dht11_temp_frac,
     output [7:0] o_dht11_humi,
+    output [7:0] o_dht11_humi_frac,
     output o_sr04_trig,
     output o_led_watch_12h,
     output o_led_stopwatch,
@@ -53,6 +55,35 @@ module execute_unit (
 
     // soft clear는 execute 경계에서는 공통 reset처럼 취급한다.
     wire w_execute_rst = rst | i_soft_clear_pulse;
+    // 센서는 표시 context와 무관하게 계속 latest value를 갱신해야
+    // remote status/log가 언제 나가도 최신값을 실어 보낼 수 있다.
+    // context 진입 시 1회 refresh는 decision_unit이 만들고,
+    // 여기서는 reset 이후 background 주기 refresh를 계속 추가한다.
+    wire w_sr04_auto_refresh_req;
+    wire w_dht11_auto_refresh_req;
+    wire w_sr04_measure_req;
+    wire w_dht11_measure_req;
+
+    assign w_sr04_measure_req = i_sr04_refresh_req | w_sr04_auto_refresh_req;
+    assign w_dht11_measure_req = i_dht11_refresh_req | w_dht11_auto_refresh_req;
+
+    sensor_periodic_refresh #(
+        .PERIOD_CYCLES(10_000_000)  // 100ms @ 100MHz
+    ) U_SR04_PERIODIC_REFRESH (
+        .clk(clk),
+        .rst(w_execute_rst),
+        .i_enable(1'b1),
+        .o_refresh_pulse(w_sr04_auto_refresh_req)
+    );
+
+    sensor_periodic_refresh #(
+        .PERIOD_CYCLES(100_000_000)  // 1s @ 100MHz
+    ) U_DHT11_PERIODIC_REFRESH (
+        .clk(clk),
+        .rst(w_execute_rst),
+        .i_enable(1'b1),
+        .o_refresh_pulse(w_dht11_auto_refresh_req)
+    );
 
     watch_stopwatch_unit U_WATCH_STOPWATCH_UNIT (
         .clk(clk),
@@ -84,15 +115,16 @@ module execute_unit (
         .o_led_stopwatch(o_led_stopwatch)
     );
 
-    // 센서 wrapper는 hierarchy와 top 경계를 먼저 확정하기 위한 placeholder다.
-    // 실제 측정 core 연동은 팀원 요청 문서 기준으로 대체한다.
+    // 센서 블록은 latest value를 내부에 유지하고,
+    // execute_unit이 주기 refresh를 넣어 실제 보드 표시와 status 응답을
+    // 계속 최신값으로 유지한다.
     sr04_unit U_SR04_UNIT (
         .clk(clk),
         .rst(w_execute_rst),
-        .i_refresh_req(i_sr04_refresh_req),
+        .i_refresh_req(w_sr04_measure_req),
         .echo(i_echo),
         .trig(o_sr04_trig),
-        .o_distance_cm(o_sr04_distance_cm),
+        .o_distance_mm(o_sr04_distance_mm),
         .o_fnd_com(o_sr04_fnd_com),
         .o_fnd_data(o_sr04_fnd_data)
     );
@@ -100,15 +132,51 @@ module execute_unit (
     dht11_unit U_DHT11_UNIT (
         .clk(clk),
         .rst(w_execute_rst),
-        .i_refresh_req(i_dht11_refresh_req),
+        .i_refresh_req(w_dht11_measure_req),
         .i_show_humi(i_dht11_show_humi),
+        .i_show_fahrenheit(i_dht11_show_fahrenheit),
         .dht11_io(io_dht11),
         .o_temp(o_dht11_temp),
+        .o_temp_frac(o_dht11_temp_frac),
         .o_humi(o_dht11_humi),
+        .o_humi_frac(o_dht11_humi_frac),
         .o_valid(o_led_dht11_valid),
         .o_fnd_com(o_dht11_fnd_com),
         .o_fnd_data(o_dht11_fnd_data)
     );
+
+endmodule
+
+// 센서 블록에 일정 주기로 refresh pulse를 만든다.
+// 현재 revision에서는 reset 이후 background 갱신용으로 상시 enable로 사용한다.
+module sensor_periodic_refresh #(
+    parameter integer PERIOD_CYCLES = 100_000_000
+) (
+    input clk,
+    input rst,
+    input i_enable,
+    output reg o_refresh_pulse
+);
+
+    localparam integer COUNT_W = (PERIOD_CYCLES <= 1) ? 1 : $clog2(PERIOD_CYCLES);
+
+    reg [COUNT_W-1:0] r_count;
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            r_count <= {COUNT_W{1'b0}};
+            o_refresh_pulse <= 1'b0;
+        end else if (!i_enable) begin
+            r_count <= {COUNT_W{1'b0}};
+            o_refresh_pulse <= 1'b0;
+        end else if (r_count == PERIOD_CYCLES - 1) begin
+            r_count <= {COUNT_W{1'b0}};
+            o_refresh_pulse <= 1'b1;
+        end else begin
+            r_count <= r_count + 1'b1;
+            o_refresh_pulse <= 1'b0;
+        end
+    end
 
 endmodule
 

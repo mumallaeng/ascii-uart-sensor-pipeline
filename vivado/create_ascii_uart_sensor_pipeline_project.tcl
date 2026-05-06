@@ -29,11 +29,15 @@ set source_files [list \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new ascii_uart_sensor_pipeline.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new context_manager.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new decision_unit.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new dht11.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new display_unit.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new fnd_controller_dht11.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new fnd_controller_sr04.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new log_byte_sender.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new execute_unit.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new remote_output_unit.v] \
     [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new remote_input_unit.v] \
+    [file join $repo_root ascii_uart_sensor_pipeline.srcs sources_1 new sr04.v] \
 ]
 
 set sim_files [list \

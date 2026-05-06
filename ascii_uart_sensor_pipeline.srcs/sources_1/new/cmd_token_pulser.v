@@ -11,7 +11,9 @@ module cmd_token_pulser (
     output reg cmd_btnR_hold,
     output reg cmd_btnL,
     output reg cmd_btnU,
+    output reg cmd_btnU_hold,
     output reg cmd_btnD,
+    output reg cmd_btnD_hold,
     output reg cmd_status,
     output reg cmd_clr
 );
@@ -42,7 +44,9 @@ module cmd_token_pulser (
         cmd_btnR_hold = 1'b0;
         cmd_btnL = 1'b0;
         cmd_btnU = 1'b0;
+        cmd_btnU_hold = 1'b0;
         cmd_btnD = 1'b0;
+        cmd_btnD_hold = 1'b0;
         cmd_status = 1'b0;
         cmd_clr = 1'b0;
 
@@ -63,7 +67,9 @@ module cmd_token_pulser (
                     `CMD_BTNR_HOLD: cmd_btnR_hold = 1'b1;
                     `CMD_BTNL: cmd_btnL = 1'b1;
                     `CMD_BTNU: cmd_btnU = 1'b1;
+                    `CMD_BTNU_HOLD: cmd_btnU_hold = 1'b1;
                     `CMD_BTND: cmd_btnD = 1'b1;
+                    `CMD_BTND_HOLD: cmd_btnD_hold = 1'b1;
                     `CMD_STATUS: cmd_status = 1'b1;
                     `CMD_CLR: cmd_clr = 1'b1;
                     default: begin

@@ -163,10 +163,14 @@ set rtl_files [list \
     $container_project_root/ascii_uart_sensor_pipeline.srcs/sources_1/new/cmd_token_pulser.v \
     $container_project_root/ascii_uart_sensor_pipeline.srcs/sources_1/new/context_manager.v \
     $container_project_root/ascii_uart_sensor_pipeline.srcs/sources_1/new/decision_unit.v \
+    $container_project_root/ascii_uart_sensor_pipeline.srcs/sources_1/new/dht11.v \
     $container_project_root/ascii_uart_sensor_pipeline.srcs/sources_1/new/display_unit.v \
     $container_project_root/ascii_uart_sensor_pipeline.srcs/sources_1/new/remote_output_unit.v \
     $container_project_root/ascii_uart_sensor_pipeline.srcs/sources_1/new/execute_unit.v \
+    $container_project_root/ascii_uart_sensor_pipeline.srcs/sources_1/new/fnd_controller_dht11.v \
+    $container_project_root/ascii_uart_sensor_pipeline.srcs/sources_1/new/fnd_controller_sr04.v \
     $container_project_root/ascii_uart_sensor_pipeline.srcs/sources_1/new/remote_input_unit.v \
+    $container_project_root/ascii_uart_sensor_pipeline.srcs/sources_1/new/sr04.v \
     $container_project_root/ascii_uart_sensor_pipeline.srcs/sources_1/new/ascii_uart_sensor_pipeline.v \
 ]
 

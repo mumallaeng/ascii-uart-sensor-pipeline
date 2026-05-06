@@ -17,9 +17,13 @@ module ascii_log_formatter #(
     input      [4:0]             i_stopwatch_hour,
     input      [5:0]             i_stopwatch_min,
     input      [5:0]             i_stopwatch_sec,
-    input      [8:0]             i_sr04_distance_cm,
+    input      [11:0]            i_sr04_distance_mm,
     input      [7:0]             i_dht_temp,
+    input      [7:0]             i_dht_temp_frac,
     input      [7:0]             i_dht_humi,
+    input      [7:0]             i_dht_humi_frac,
+    input                        i_dht_show_humi,
+    input                        i_dht_show_fahrenheit,
     input                        i_dht_valid,
     output reg [7:0]                   o_frame_byte,
     output reg [FRAME_LEN_W-1:0]       o_frame_len
@@ -81,11 +85,50 @@ module ascii_log_formatter #(
     endtask
 
     task append_dec3;
-        input [8:0] value;
+        input [11:0] value;
         begin
             append_byte(ASCII_ZERO + ((value / 100) % 10));
             append_byte(ASCII_ZERO + ((value / 10) % 10));
             append_byte(ASCII_ZERO + (value % 10));
+        end
+    endtask
+
+    task append_fixed1_from_mm;
+        input [11:0] value_mm;
+        reg [11:0] value_cm_int;
+        reg [3:0] value_cm_frac;
+        begin
+            value_cm_int = value_mm / 10;
+            value_cm_frac = value_mm % 10;
+            append_dec3(value_cm_int);
+            append_ascii_char(".");
+            append_byte(ASCII_ZERO + value_cm_frac);
+        end
+    endtask
+
+    task append_fixed2;
+        input [7:0] value_int;
+        input [7:0] value_frac;
+        begin
+            append_dec2(value_int);
+            append_ascii_char(".");
+            append_dec2(value_frac);
+        end
+    endtask
+
+    task append_fixed1_fahrenheit;
+        input [7:0] value_c_int;
+        input [7:0] value_c_frac;
+        reg [15:0] value_c_x100;
+        reg [15:0] value_f_x100;
+        reg [11:0] value_f_x10;
+        begin
+            value_c_x100 = (value_c_int * 16'd100) + value_c_frac;
+            value_f_x100 = ((value_c_x100 * 16'd9) / 16'd5) + 16'd3200;
+            value_f_x10 = value_f_x100 / 10;
+            append_dec3((value_f_x10 / 10) % 1000);
+            append_ascii_char(".");
+            append_byte(ASCII_ZERO + (value_f_x10 % 10));
         end
     endtask
 
@@ -489,7 +532,7 @@ module ascii_log_formatter #(
             append_ascii_char("0");
             append_ascii_char("4");
             append_byte(ASCII_EQUALS);
-            append_dec3(i_sr04_distance_cm);
+            append_fixed1_from_mm(i_sr04_distance_mm);
             append_ascii_char("c");
             append_ascii_char("m");
             append_crlf();
@@ -512,12 +555,15 @@ module ascii_log_formatter #(
                 append_ascii_char("L");
                 append_ascii_char("I");
                 append_ascii_char("D");
-            end else begin
-                append_dec2(i_dht_temp);
-                append_ascii_char("C");
-                append_byte(ASCII_SLASH);
-                append_dec2(i_dht_humi);
+            end else if (i_dht_show_humi) begin
+                append_fixed2(i_dht_humi, i_dht_humi_frac);
                 append_byte(ASCII_PERCENT);
+            end else if (i_dht_show_fahrenheit) begin
+                append_fixed1_fahrenheit(i_dht_temp, i_dht_temp_frac);
+                append_ascii_char("F");
+            end else begin
+                append_fixed2(i_dht_temp, i_dht_temp_frac);
+                append_ascii_char("C");
             end
             append_crlf();
         end
@@ -546,7 +592,9 @@ module ascii_log_formatter #(
     always @(i_byte_index or i_unknown_cmd or i_log_src or i_log_cmd or i_log_evt or
              i_current_context or i_log_act or i_watch_live_time or
              i_stopwatch_hour or i_stopwatch_min or i_stopwatch_sec or
-             i_sr04_distance_cm or i_dht_temp or i_dht_humi or
+             i_sr04_distance_mm or i_dht_temp or i_dht_temp_frac or
+             i_dht_humi or i_dht_humi_frac or
+             i_dht_show_humi or i_dht_show_fahrenheit or
              i_dht_valid) begin
         clear_frame();
 

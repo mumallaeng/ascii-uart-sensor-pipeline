@@ -10,7 +10,9 @@ module remote_input_unit (
     output cmd_btnR_hold,
     output cmd_btnL,
     output cmd_btnU,
+    output cmd_btnU_hold,
     output cmd_btnD,
+    output cmd_btnD_hold,
     output cmd_status,
     output cmd_clr,
     output unknown_cmd
@@ -50,7 +52,9 @@ module remote_input_unit (
         .cmd_btnR_hold(cmd_btnR_hold),
         .cmd_btnL(cmd_btnL),
         .cmd_btnU(cmd_btnU),
+        .cmd_btnU_hold(cmd_btnU_hold),
         .cmd_btnD(cmd_btnD),
+        .cmd_btnD_hold(cmd_btnD_hold),
         .cmd_status(cmd_status),
         .cmd_clr(cmd_clr)
     );
@@ -203,12 +207,34 @@ module ascii_command_parser #(
         end
     endfunction
 
+    function match_btnU_hold;
+        input [3:0] cmd_char_count;
+        input [7:0] c0, c1, c2, c3, c4, c5, c6, c7, c8;
+        begin
+            match_btnU_hold = (cmd_char_count == 9) &&
+                (c0 == "b") && (c1 == "t") && (c2 == "n") && (c3 == "U") &&
+                (c4 == "_") &&
+                (c5 == "h") && (c6 == "o") && (c7 == "l") && (c8 == "d");
+        end
+    endfunction
+
     function match_btnD;
         input [3:0] cmd_char_count;
         input [7:0] c0, c1, c2, c3;
         begin
             match_btnD = (cmd_char_count == 4) &&
                 (c0 == "b") && (c1 == "t") && (c2 == "n") && (c3 == "D");
+        end
+    endfunction
+
+    function match_btnD_hold;
+        input [3:0] cmd_char_count;
+        input [7:0] c0, c1, c2, c3, c4, c5, c6, c7, c8;
+        begin
+            match_btnD_hold = (cmd_char_count == 9) &&
+                (c0 == "b") && (c1 == "t") && (c2 == "n") && (c3 == "D") &&
+                (c4 == "_") &&
+                (c5 == "h") && (c6 == "o") && (c7 == "l") && (c8 == "d");
         end
     endfunction
 
@@ -326,8 +352,14 @@ module ascii_command_parser #(
                 end else if (match_btnU(cmd_char_count_reg, cmd_chars_reg[0], cmd_chars_reg[1], cmd_chars_reg[2], cmd_chars_reg[3])) begin
                     cmd_token_code_next = `CMD_BTNU;
                     state_next = OUTPUT;
+                end else if (match_btnU_hold(cmd_char_count_reg, cmd_chars_reg[0], cmd_chars_reg[1], cmd_chars_reg[2], cmd_chars_reg[3], cmd_chars_reg[4], cmd_chars_reg[5], cmd_chars_reg[6], cmd_chars_reg[7], cmd_chars_reg[8])) begin
+                    cmd_token_code_next = `CMD_BTNU_HOLD;
+                    state_next = OUTPUT;
                 end else if (match_btnD(cmd_char_count_reg, cmd_chars_reg[0], cmd_chars_reg[1], cmd_chars_reg[2], cmd_chars_reg[3])) begin
                     cmd_token_code_next = `CMD_BTND;
+                    state_next = OUTPUT;
+                end else if (match_btnD_hold(cmd_char_count_reg, cmd_chars_reg[0], cmd_chars_reg[1], cmd_chars_reg[2], cmd_chars_reg[3], cmd_chars_reg[4], cmd_chars_reg[5], cmd_chars_reg[6], cmd_chars_reg[7], cmd_chars_reg[8])) begin
+                    cmd_token_code_next = `CMD_BTND_HOLD;
                     state_next = OUTPUT;
                 end else if (match_status(cmd_char_count_reg, cmd_chars_reg[0], cmd_chars_reg[1], cmd_chars_reg[2], cmd_chars_reg[3], cmd_chars_reg[4], cmd_chars_reg[5])) begin
                     cmd_token_code_next = `CMD_STATUS;

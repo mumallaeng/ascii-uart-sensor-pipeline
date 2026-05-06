@@ -54,13 +54,16 @@ module ascii_uart_sensor_pipeline (
     wire w_context_change_pulse;
     wire w_watch_12h;
     wire w_dht11_show_humi;
+    wire w_dht11_show_fahrenheit;
 
     // INPUT 구간 remote command bundle.
     wire w_cmd_btnR;
     wire w_cmd_btnR_hold;
     wire w_cmd_btnL;
     wire w_cmd_btnU;
+    wire w_cmd_btnU_hold;
     wire w_cmd_btnD;
+    wire w_cmd_btnD_hold;
     wire w_cmd_status;
     wire w_cmd_clr;
     wire w_unknown_cmd;
@@ -102,9 +105,11 @@ module ascii_uart_sensor_pipeline (
     wire [7:0] w_execute_sr04_fnd_data;
     wire [3:0] w_execute_dht11_fnd_com;
     wire [7:0] w_execute_dht11_fnd_data;
-    wire [8:0] w_execute_sr04_distance_cm;
+    wire [11:0] w_execute_sr04_distance_mm;
     wire [7:0] w_execute_dht11_temp;
+    wire [7:0] w_execute_dht11_temp_frac;
     wire [7:0] w_execute_dht11_humi;
+    wire [7:0] w_execute_dht11_humi_frac;
     wire w_execute_sr04_trig;
     wire w_execute_led_watch_12h;
     wire w_execute_led_stopwatch;
@@ -146,7 +151,8 @@ module ascii_uart_sensor_pipeline (
         .o_current_context(w_current_context),
         .o_context_change_pulse(w_context_change_pulse),
         .o_watch_12h(w_watch_12h),
-        .o_dht11_show_humi(w_dht11_show_humi)
+        .o_dht11_show_humi(w_dht11_show_humi),
+        .o_dht11_show_fahrenheit(w_dht11_show_fahrenheit)
     );
 
     remote_input_unit U_REMOTE_INPUT_UNIT (
@@ -157,7 +163,9 @@ module ascii_uart_sensor_pipeline (
         .cmd_btnR_hold(w_cmd_btnR_hold),
         .cmd_btnL(w_cmd_btnL),
         .cmd_btnU(w_cmd_btnU),
+        .cmd_btnU_hold(w_cmd_btnU_hold),
         .cmd_btnD(w_cmd_btnD),
+        .cmd_btnD_hold(w_cmd_btnD_hold),
         .cmd_status(w_cmd_status),
         .cmd_clr(w_cmd_clr),
         .unknown_cmd(w_unknown_cmd)
@@ -179,7 +187,9 @@ module ascii_uart_sensor_pipeline (
         .i_cmd_btnR_hold(w_cmd_btnR_hold),
         .i_cmd_btnL(w_cmd_btnL),
         .i_cmd_btnU(w_cmd_btnU),
+        .i_cmd_btnU_hold(w_cmd_btnU_hold),
         .i_cmd_btnD(w_cmd_btnD),
+        .i_cmd_btnD_hold(w_cmd_btnD_hold),
         .i_cmd_status(w_cmd_status),
         .i_cmd_clr(w_cmd_clr),
         .i_current_context(w_current_context),
@@ -211,6 +221,7 @@ module ascii_uart_sensor_pipeline (
         .i_current_context(w_current_context),
         .i_watch_12h(w_watch_12h),
         .i_dht11_show_humi(w_dht11_show_humi),
+        .i_dht11_show_fahrenheit(w_dht11_show_fahrenheit),
         .i_watch_display_toggle_pulse(w_watch_display_toggle_pulse),
         .i_watch_set_mode_toggle_pulse(w_watch_set_mode_toggle_pulse),
         .i_watch_set_index_next_pulse(w_watch_set_index_next_pulse),
@@ -242,9 +253,11 @@ module ascii_uart_sensor_pipeline (
         .o_sr04_fnd_data(w_execute_sr04_fnd_data),
         .o_dht11_fnd_com(w_execute_dht11_fnd_com),
         .o_dht11_fnd_data(w_execute_dht11_fnd_data),
-        .o_sr04_distance_cm(w_execute_sr04_distance_cm),
+        .o_sr04_distance_mm(w_execute_sr04_distance_mm),
         .o_dht11_temp(w_execute_dht11_temp),
+        .o_dht11_temp_frac(w_execute_dht11_temp_frac),
         .o_dht11_humi(w_execute_dht11_humi),
+        .o_dht11_humi_frac(w_execute_dht11_humi_frac),
         .o_sr04_trig(w_execute_sr04_trig),
         .o_led_watch_12h(w_execute_led_watch_12h),
         .o_led_stopwatch(w_execute_led_stopwatch),
@@ -277,9 +290,13 @@ module ascii_uart_sensor_pipeline (
         .i_stopwatch_hour(w_execute_stopwatch_hour),
         .i_stopwatch_min(w_execute_stopwatch_min),
         .i_stopwatch_sec(w_execute_stopwatch_sec),
-        .i_sr04_distance_cm(w_execute_sr04_distance_cm),
+        .i_sr04_distance_mm(w_execute_sr04_distance_mm),
         .i_dht_temp(w_execute_dht11_temp),
+        .i_dht_temp_frac(w_execute_dht11_temp_frac),
         .i_dht_humi(w_execute_dht11_humi),
+        .i_dht_humi_frac(w_execute_dht11_humi_frac),
+        .i_dht_show_humi(w_dht11_show_humi),
+        .i_dht_show_fahrenheit(w_dht11_show_fahrenheit),
         .i_dht_valid(w_execute_led_dht11_valid),
         .o_tx(w_remote_output_tx)
     );

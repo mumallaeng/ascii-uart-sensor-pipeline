@@ -23,6 +23,8 @@
 `define CMD_BTND 4'd5
 `define CMD_STATUS 4'd6
 `define CMD_CLR 4'd7
+`define CMD_BTNU_HOLD 4'd8
+`define CMD_BTND_HOLD 4'd9
 
 `define EVT_W 4
 `define EVT_NONE 4'd0

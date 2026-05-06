@@ -40,7 +40,9 @@ module tb_input_unit;
     wire cmd_btnR_hold;
     wire cmd_btnL;
     wire cmd_btnU;
+    wire cmd_btnU_hold;
     wire cmd_btnD;
+    wire cmd_btnD_hold;
     wire cmd_status;
     wire cmd_clr;
     wire unknown_cmd;
@@ -50,6 +52,7 @@ module tb_input_unit;
     reg seen_local_btnC;
     reg seen_context_change;
     reg seen_remote_btnR;
+    reg seen_remote_btnU_hold;
     reg seen_remote_status;
     reg seen_unknown_cmd;
 
@@ -111,7 +114,9 @@ module tb_input_unit;
         .cmd_btnR_hold(cmd_btnR_hold),
         .cmd_btnL(cmd_btnL),
         .cmd_btnU(cmd_btnU),
+        .cmd_btnU_hold(cmd_btnU_hold),
         .cmd_btnD(cmd_btnD),
+        .cmd_btnD_hold(cmd_btnD_hold),
         .cmd_status(cmd_status),
         .cmd_clr(cmd_clr),
         .unknown_cmd(unknown_cmd)
@@ -144,6 +149,11 @@ module tb_input_unit;
     always @(posedge rst or posedge cmd_btnR) begin
         if (rst) seen_remote_btnR <= 1'b0;
         else seen_remote_btnR <= 1'b1;
+    end
+
+    always @(posedge rst or posedge cmd_btnU_hold) begin
+        if (rst) seen_remote_btnU_hold <= 1'b0;
+        else seen_remote_btnU_hold <= 1'b1;
     end
 
     always @(posedge rst or posedge cmd_status) begin
@@ -192,6 +202,21 @@ module tb_input_unit;
             send_uart_byte("t");
             send_uart_byte("u");
             send_uart_byte("s");
+            send_uart_byte(8'h0D);
+        end
+    endtask
+
+    task automatic send_text_btnU_hold;
+        begin
+            send_uart_byte("b");
+            send_uart_byte("t");
+            send_uart_byte("n");
+            send_uart_byte("U");
+            send_uart_byte("_");
+            send_uart_byte("h");
+            send_uart_byte("o");
+            send_uart_byte("l");
+            send_uart_byte("d");
             send_uart_byte(8'h0D);
         end
     endtask
@@ -245,6 +270,7 @@ module tb_input_unit;
         seen_local_btnC = 1'b0;
         seen_context_change = 1'b0;
         seen_remote_btnR = 1'b0;
+        seen_remote_btnU_hold = 1'b0;
         seen_remote_status = 1'b0;
         seen_unknown_cmd = 1'b0;
 
@@ -269,19 +295,24 @@ module tb_input_unit;
         if (!seen_remote_status) $fatal(1, "remote status pulse missing");
         if (seen_unknown_cmd) $fatal(1, "unexpected unknown_cmd pulse");
 
-        // Check 3: local btnR short pulse.
+        // Check 3: remote btnU_hold command pulse.
+        send_text_btnU_hold();
+        #(BIT_PERIOD_NS * 24);
+        if (!seen_remote_btnU_hold) $fatal(1, "remote btnU_hold pulse missing");
+
+        // Check 4: local btnR short pulse.
         press_btnR_short();
         if (!seen_local_btnR) $fatal(1, "local btnR short pulse missing");
 
-        // Check 4: local btnR hold pulse.
+        // Check 5: local btnR hold pulse.
         press_btnR_hold();
         if (!seen_local_btnR_hold) $fatal(1, "local btnR hold pulse missing");
 
-        // Check 5: local btnC short pulse.
+        // Check 6: local btnC short pulse.
         press_btnC_short();
         if (!seen_local_btnC) $fatal(1, "local btnC short pulse missing");
 
-        // Check 6: DHT11으로 context 전환되고 sw15 option decode가 맞는지 본다.
+        // Check 7: DHT11으로 context 전환되고 sw15 option decode가 맞는지 본다.
         // context_manager는 1-cycle transition pulse를 내므로
         // 첫 clock 직후 바로 샘플링한다.
         @(negedge clk);
@@ -296,7 +327,7 @@ module tb_input_unit;
         #1;
         if (context_change_pulse !== 1'b0) $fatal(1, "context_change_pulse should be one cycle");
 
-        // Check 7: WATCH로 돌아오면 같은 sw15 값이 watch 12h option으로
+        // Check 8: WATCH로 돌아오면 같은 sw15 값이 watch 12h option으로
         // 다시 해석돼야 한다.
         @(negedge clk);
         sw_context = `CTX_WATCH;

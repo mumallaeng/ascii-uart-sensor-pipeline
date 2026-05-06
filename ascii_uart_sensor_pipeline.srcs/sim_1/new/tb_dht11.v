@@ -2,10 +2,12 @@
 module tb_dht11 ();
     // 시뮬레이션 파라미터
     parameter [7:0] HUMI_INT = 8'd60;  // 습도 정수부
+    parameter [7:0] HUMI_FRAC = 8'd34;  // 습도 소수부
     parameter [7:0] TEMP_INT = 8'd25;  // 온도 정수부
+    parameter [7:0] TEMP_FRAC = 8'd56;  // 온도 소수부
 
     parameter [39:0] DATA_STREAM = {
-        HUMI_INT, 8'h00, TEMP_INT, 8'h00, HUMI_INT + TEMP_INT
+        HUMI_INT, HUMI_FRAC, TEMP_INT, TEMP_FRAC, HUMI_INT + HUMI_FRAC + TEMP_INT + TEMP_FRAC
     };
 
     reg clk;
@@ -14,6 +16,7 @@ module tb_dht11 ();
     // dht11_unit 입력
     reg i_dht11_refresh_req;
     reg i_dht11_show_humi;
+    reg i_dht11_show_fahrenheit;
 
     // testbench가 가짜 DHT11 센서 역할을 하기 위한 신호
     reg dht_sensor_data;
@@ -22,7 +25,9 @@ module tb_dht11 ();
 
     // dht11_unit 출력
     wire [7:0] o_dht11_temp;
+    wire [7:0] o_dht11_temp_frac;
     wire [7:0] o_dht11_humi;
+    wire [7:0] o_dht11_humi_frac;
     wire o_led_dht11_valid;
     wire [3:0] o_dht11_fnd_com;
     wire [7:0] o_dht11_fnd_data;
@@ -41,9 +46,12 @@ module tb_dht11 ();
         .rst(rst),
         .i_refresh_req(i_dht11_refresh_req),
         .i_show_humi(i_dht11_show_humi),
+        .i_show_fahrenheit(i_dht11_show_fahrenheit),
         .dht11_io(io_dht11),
         .o_temp(o_dht11_temp),
+        .o_temp_frac(o_dht11_temp_frac),
         .o_humi(o_dht11_humi),
+        .o_humi_frac(o_dht11_humi_frac),
         .o_valid(o_led_dht11_valid),
         .o_fnd_com(o_dht11_fnd_com),
         .o_fnd_data(o_dht11_fnd_data)
@@ -58,6 +66,7 @@ module tb_dht11 ();
 
         i_dht11_refresh_req = 1'b0;
         i_dht11_show_humi = 1'b0;  // 0: 온도 표시, 1: 습도 표시
+        i_dht11_show_fahrenheit = 1'b0;
 
         io_oe = 1'b0;  // 처음에는 testbench가 DATA line을 잡지 않음
         dht_sensor_data = 1'b1;  // DHT11 idle 상태는 HIGH
@@ -140,8 +149,9 @@ module tb_dht11 ();
         i_dht11_show_humi = 1'b0;  // 온도 표시 모드
         #1_000_000;
 
-        $display("TEMP = %0d, HUMI = %0d, VALID = %b", o_dht11_temp,
-                 o_dht11_humi, o_led_dht11_valid);
+        $display("TEMP = %0d.%02d, HUMI = %0d.%02d, VALID = %b", o_dht11_temp,
+                 o_dht11_temp_frac, o_dht11_humi, o_dht11_humi_frac,
+                 o_led_dht11_valid);
 
         $stop;
     end
