@@ -17,6 +17,7 @@ module tb_dht11_jm ();
     wire [3:0] fnd_com;
     wire [7:0] fnd_data;
     wire dht11;
+    // pullup (dht11);
 
     //  tb io mode 변환.
     assign dht11 = (io_oe) ? dht_sensor_data : 1'bz; // 센서 입장에서 io를 제어해주는 것
@@ -39,6 +40,7 @@ module tb_dht11_jm ();
         clk = 0;
         rst = 1;
         io_oe = 0;
+        // dht_sensor_data = 1'b1; // dht11의 IDLE 상태에선 HIGH 유지
         btn_R = 0;
         sw15 = 0; // 온도
 
@@ -55,24 +57,22 @@ module tb_dht11_jm ();
         wait (dht11);
         #30000; // 겹치는 구간 z 잠깐 발생할 수도 있음
         // 입력 모드로 변환
-        io_oe = 1;
-        btn_R = 1;
-        #1_000_000;
-        btn_R = 0;
-        dht_sensor_data = 1'b0;
-        #80000;
-        dht_sensor_data = 1'b1;
+        io_oe = 1; // FPGA 입력
+        #5000;
+        dht_sensor_data = 1'b0; // SYNCL
+        #75000;
+        dht_sensor_data = 1'b1; // SYNCH
         #80000;
         for (i = 39; i >= 0; i = i - 1) begin
-            dht_sensor_data = 0;
+            dht_sensor_data = 0; // DATA SYNC 0
             #50000;
-            dht_sensor_data = 1'b1;
-            #(DATA_STREAM[i] ? 70000 : 26000);
+            dht_sensor_data = 1'b1; // DATA SYNC
+            #(DATA_STREAM[i] ? 70000 : 26000); // HIGH의 시간을 재서 DATA 0인지 1인지 판별
 
         end
-        dht_sensor_data = 0;
+        dht_sensor_data = 0; // DATA DECISION이 끝나고 STOP으로 감
         #50000;
-        io_oe = 0;
+        io_oe = 0; // FPGA 출력
         #50000;
         $stop;
     end
