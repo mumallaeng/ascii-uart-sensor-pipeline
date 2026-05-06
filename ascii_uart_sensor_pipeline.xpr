@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="54" Path="D:/workspace/ascii-uart-sensor-pipeline/ascii_uart_sensor_pipeline.xpr">
+<Project Version="7" Minor="54" Path="$PPRDIR/ascii_uart_sensor_pipeline.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="68266e625dd04328832b1b81a5a7aa3e"/>

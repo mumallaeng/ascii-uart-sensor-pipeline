@@ -14,32 +14,40 @@ module context_manager (
     output o_dht11_show_fahrenheit
 );
 
-    // 프로젝트 메모:
-    // - 현재 revision에서는 raw switch를 그대로 사용한다.
-    //   synchronizer 추가는 후속 작업으로 남겨 둔다.
-    // - sw[1:0]는 top-level context 선택값이다.
-    // - sensor 구간에서는 sw15를 "같은 센서 묶음 안의 표시 모드"로 재해석한다.
-    //   10/0 : SR04
-    //   10/1 : DHT11 humidity
-    //   11/0 : DHT11 celsius
-    //   11/1 : DHT11 fahrenheit
+    // sw[1:0], sw15는 보드의 기계식/비동기 입력이므로
+    // context_manager 안에서 먼저 2FF synchronizer를 거친 뒤 해석한다.
+    // 이렇게 하면 context 전환과 sensor view decode가 clk edge 근처 전환에 덜 민감해진다.
+    reg [1:0] r_sw_context_ff0;
+    reg [1:0] r_sw_context_ff1;
+    reg       r_sw15_ff0;
+    reg       r_sw15_ff1;
 
     wire [`CTX_W-1:0] w_decoded_context;
 
     assign w_decoded_context =
-        (i_sw_context == 2'b00) ? `CTX_WATCH :
-        (i_sw_context == 2'b01) ? `CTX_STOPWATCH :
-        (i_sw_context == 2'b10) ? (i_sw15 ? `CTX_DHT11 : `CTX_SR04) :
-                                  `CTX_DHT11;
-    assign o_watch_12h = (o_current_context == `CTX_WATCH) && i_sw15;
-    assign o_dht11_show_humi = (i_sw_context == 2'b10) && i_sw15;
-    assign o_dht11_show_fahrenheit = (i_sw_context == 2'b11) && i_sw15;
+        (r_sw_context_ff1 == 2'b00) ? `CTX_WATCH :
+        (r_sw_context_ff1 == 2'b01) ? `CTX_STOPWATCH :
+        (r_sw_context_ff1 == 2'b10) ? (r_sw15_ff1 ? `CTX_DHT11 : `CTX_SR04) :
+                                      `CTX_DHT11;
+
+    assign o_watch_12h = (o_current_context == `CTX_WATCH) && r_sw15_ff1;
+    assign o_dht11_show_humi = (r_sw_context_ff1 == 2'b10) && r_sw15_ff1;
+    assign o_dht11_show_fahrenheit = (r_sw_context_ff1 == 2'b11) && r_sw15_ff1;
 
     always @(posedge clk or posedge rst) begin
         if (rst) begin
+            r_sw_context_ff0 <= 2'b00;
+            r_sw_context_ff1 <= 2'b00;
+            r_sw15_ff0 <= 1'b0;
+            r_sw15_ff1 <= 1'b0;
             o_current_context <= `CTX_WATCH;
             o_context_change_pulse <= 1'b0;
         end else begin
+            r_sw_context_ff0 <= i_sw_context;
+            r_sw_context_ff1 <= r_sw_context_ff0;
+            r_sw15_ff0 <= i_sw15;
+            r_sw15_ff1 <= r_sw15_ff0;
+
             o_context_change_pulse <= (w_decoded_context != o_current_context);
             o_current_context <= w_decoded_context;
         end
