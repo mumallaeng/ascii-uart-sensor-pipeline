@@ -1,57 +1,53 @@
 `timescale 1ns / 1ps
 
-module dht11 (
+module dht11_unit (
     input clk,
     input rst,
-    input btn_R,
-    input sw15,
-    output led,
-    output [3:0] fnd_com,
-    output [7:0] fnd_data,
-    inout dht11
+    input i_refresh_req,
+    input i_show_humi,
+    inout dht11_io,
+
+    output [7:0] o_temp,
+    output [7:0] o_humi,
+    output       o_valid,
+    output [3:0] o_fnd_com,
+    output [7:0] o_fnd_data
 );
 
-    wire w_tick_us;
-    wire w_dht11_start;
-    wire [7:0] w_hm, w_tm;
 
-    assign led = valid;
+    wire w_tick_us, w_valid;
+    wire [7:0] w_humi, w_temp;
 
-    fnd_controller_dht11 U_FND_CNTL (
+    assign o_temp = w_temp;
+    assign o_humi = w_humi;
+    assign o_valid = w_valid;
+
+    dht11_fnd_controller U_FND_CNTL (
         .clk     (clk),
         .rst     (rst),
-        .sw15    (sw15),
-        .tm      (w_tm),
-        .hm      (w_hm),
-        .fnd_com (fnd_com),
-        .fnd_data(fnd_data)
+        .sw15    (i_show_humi),
+        .tm      (w_temp),
+        .hm      (w_humi),
+        .fnd_com (o_fnd_com),
+        .fnd_data(o_fnd_data)
     );
 
     dht11_controller U_DNT11_CNTL (
         .clk        (clk),
         .rst        (rst),
-        .dht11_start(w_dht11_start),
+        .dht11_start(i_refresh_req),
         .tick_us    (w_tick_us),
-        .humidity   (w_hm),
-        .temperature(w_tm),
-        .valid      (valid),
+        .humidity   (w_humi),
+        .temperature(w_temp),
+        .valid      (w_valid),
         // valid가 1이면 led ON / check sum 확인
-        .dht11      (dht11)
+        .dht11      (dht11_io)
     );
 
-    tick_gen_us U_TICK_GEN (
+    dht11_tick_gen_us U_TICK_GEN (
         .clk    (clk),
         .rst    (rst),
         .tick_us(w_tick_us)
-    );
-
-    button_debounce U_BTN_DB (
-
-        .clk  (clk),
-        .rst  (rst),
-        .i_btn(btn_R),
-        .o_btn(w_dht11_start)
-
     );
 
 endmodule
@@ -80,6 +76,8 @@ module dht11_controller (
 
     reg [39:0] data_reg, data_next;
 
+    reg dht11_sync1, dht11_sync2;
+
     // dht11 output 3state control
     assign dht11 = (out_sel_reg) ? dht11_reg : 1'bz;
 
@@ -95,6 +93,8 @@ module dht11_controller (
             tick_cnt_reg <= 0;
             out_sel_reg  <= 1'b1;  // default output mode
             dht11_reg    <= 1'b1;  // default high state
+            dht11_sync1  <= 1'b1;
+            dht11_sync2  <= 1'b1;
             data_reg     <= 0;
         end else begin
             c_state      <= n_state;
@@ -103,6 +103,8 @@ module dht11_controller (
             out_sel_reg  <= out_sel_next;
             dht11_reg    <= dht11_next;
             data_reg     <= data_next;
+            dht11_sync1  <= dht11;
+            dht11_sync2  <= dht11_sync1;
         end
     end
 
@@ -169,7 +171,7 @@ module dht11_controller (
             end
             DATA_SYNC: begin
                 if (tick_us) begin
-                    if (dht11) begin
+                    if (dht11_sync2) begin
                         tick_cnt_next = 0;
                         n_state = DATA_COUNT;
                     end else begin
@@ -179,7 +181,7 @@ module dht11_controller (
             end
             DATA_COUNT: begin
                 if (tick_us) begin
-                    if (!dht11) begin
+                    if (!dht11_sync2) begin
                         n_state = DATA_DECISION;
                     end else begin
                         tick_cnt_next = tick_cnt_reg + 1;
@@ -216,7 +218,7 @@ module dht11_controller (
 
 endmodule
 
-module tick_gen_us (
+module dht11_tick_gen_us (
     input      clk,
     input      rst,
     output reg tick_us

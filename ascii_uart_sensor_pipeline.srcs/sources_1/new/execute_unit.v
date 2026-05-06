@@ -86,7 +86,6 @@ module execute_unit (
 
     // 센서 wrapper는 hierarchy와 top 경계를 먼저 확정하기 위한 placeholder다.
     // 실제 측정 core 연동은 팀원 요청 문서 기준으로 대체한다.
-
     sr04_unit U_SR04_UNIT (
         .clk(clk),
         .rst(w_execute_rst),
@@ -317,33 +316,5 @@ module watch_stopwatch_unit #(
         .fnd_com(o_fnd_com),
         .fnd_data(o_fnd_data)
     );
-
-endmodule
-
-// dht11_unit도 execute 경계 확인용 placeholder wrapper다.
-module dht11_unit (
-    input clk,
-    input rst,
-    input i_refresh_req,
-    input i_show_humi,
-    inout dht11_io,
-    output [7:0] o_temp,
-    output [7:0] o_humi,
-    output o_valid,
-    output [3:0] o_fnd_com,
-    output [7:0] o_fnd_data
-);
-
-    wire unused_clk = clk;
-    wire unused_rst = rst;
-    wire unused_refresh_req = i_refresh_req;
-    wire unused_show_humi = i_show_humi;
-
-    assign dht11_io = 1'bz;
-    assign o_temp = 8'd0;
-    assign o_humi = 8'd0;
-    assign o_valid = 1'b0;
-    assign o_fnd_com = 4'b1111;
-    assign o_fnd_data = 8'hFF;
 
 endmodule

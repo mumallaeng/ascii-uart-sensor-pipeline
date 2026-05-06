@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module fnd_controller_dht11 #(
+module dht11_fnd_controller #(
     parameter integer CLK_FREQ_HZ = 100_000_000,
     parameter integer SCAN_HZ = 1000
 ) (
