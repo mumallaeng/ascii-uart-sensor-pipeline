@@ -1,99 +1,201 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <wave_config>
    <wave_state>
    </wave_state>
    <db_ref_list>
       <db_ref path="tb_ascii_uart_sensor_pipeline_behav.wdb" id="1">
          <top_modules>
-            <top_module name="glbl"/>
-            <top_module name="tb_ascii_uart_sensor_pipeline"/>
+            <top_module name="glbl" />
+            <top_module name="tb_ascii_uart_sensor_pipeline" />
          </top_modules>
       </db_ref>
    </db_ref_list>
-   <wvobject type="logic" fp_name="/tb_ascii_uart_sensor_pipeline/rst">
-      <obj_property name="ElementShortName">rst</obj_property>
-      <obj_property name="ObjectShortName">rst</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/tb_ascii_uart_sensor_pipeline/clk">
+   <zoom_setting>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="57546005001fs"></ZoomEndTime>
+      <Cursor1Time time="51726746067fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="371"></NameColumnWidth>
+      <ValueColumnWidth column_width="182"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="3" />
+   <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/tb_ascii_uart_sensor_pipeline/rx">
-      <obj_property name="ElementShortName">rx</obj_property>
-      <obj_property name="ObjectShortName">rx</obj_property>
+   <wvobject fp_name="group53" type="group">
+      <obj_property name="label">top</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/rx" type="logic">
+         <obj_property name="ElementShortName">rx</obj_property>
+         <obj_property name="ObjectShortName">rx</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_REMOTE_INPUT_UNIT/U_UART_RX_FIFO/o_ascii_byte_valid" type="logic">
+         <obj_property name="ElementShortName">o_ascii_byte_valid</obj_property>
+         <obj_property name="ObjectShortName">o_ascii_byte_valid</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_REMOTE_INPUT_UNIT/U_UART_RX_FIFO/o_ascii_byte" type="array">
+         <obj_property name="ElementShortName">o_ascii_byte[7:0]</obj_property>
+         <obj_property name="ObjectShortName">o_ascii_byte[7:0]</obj_property>
+         <obj_property name="Radix">ASCII</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_REMOTE_INPUT_UNIT/U_ASCII_COMMAND_PARSER/state_reg" type="array">
+         <obj_property name="ElementShortName">state_reg[2:0]</obj_property>
+         <obj_property name="ObjectShortName">state_reg[2:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_REMOTE_INPUT_UNIT/U_ASCII_COMMAND_PARSER/o_cmd_token_valid" type="logic">
+         <obj_property name="ElementShortName">o_cmd_token_valid</obj_property>
+         <obj_property name="ObjectShortName">o_cmd_token_valid</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_REMOTE_INPUT_UNIT/U_ASCII_COMMAND_PARSER/o_cmd_token_code" type="array">
+         <obj_property name="ElementShortName">o_cmd_token_code[3:0]</obj_property>
+         <obj_property name="ObjectShortName">o_cmd_token_code[3:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_REMOTE_INPUT_UNIT/U_CMD_TOKEN_PULSER/state_reg" type="logic">
+         <obj_property name="ElementShortName">state_reg</obj_property>
+         <obj_property name="ObjectShortName">state_reg</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/w_cmd_btnR" type="logic">
+         <obj_property name="ElementShortName">w_cmd_btnR</obj_property>
+         <obj_property name="ObjectShortName">w_cmd_btnR</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/w_cmd_status" type="logic">
+         <obj_property name="ElementShortName">w_cmd_status</obj_property>
+         <obj_property name="ObjectShortName">w_cmd_status</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/w_unknown_cmd" type="logic">
+         <obj_property name="ElementShortName">w_unknown_cmd</obj_property>
+         <obj_property name="ObjectShortName">w_unknown_cmd</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/tx" type="logic">
+         <obj_property name="ElementShortName">tx</obj_property>
+         <obj_property name="ObjectShortName">tx</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/trig" type="logic">
+         <obj_property name="ElementShortName">trig</obj_property>
+         <obj_property name="ObjectShortName">trig</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/fnd_com" type="array">
+         <obj_property name="ElementShortName">fnd_com[3:0]</obj_property>
+         <obj_property name="ObjectShortName">fnd_com[3:0]</obj_property>
+         <obj_property name="Radix">BINARY</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/fnd_data" type="array">
+         <obj_property name="ElementShortName">fnd_data[7:0]</obj_property>
+         <obj_property name="ObjectShortName">fnd_data[7:0]</obj_property>
+         <obj_property name="Radix">HEX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/led" type="array">
+         <obj_property name="ElementShortName">led[2:0]</obj_property>
+         <obj_property name="ObjectShortName">led[2:0]</obj_property>
+         <obj_property name="Radix">BINARY</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject type="logic" fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_REMOTE_INPUT_UNIT/U_UART_RX_FIFO/o_ascii_byte_valid">
-      <obj_property name="ElementShortName">o_ascii_byte_valid</obj_property>
-      <obj_property name="ObjectShortName">o_ascii_byte_valid</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_REMOTE_INPUT_UNIT/U_UART_RX_FIFO/o_ascii_byte">
-      <obj_property name="ElementShortName">o_ascii_byte[7:0]</obj_property>
-      <obj_property name="ObjectShortName">o_ascii_byte[7:0]</obj_property>
-      <obj_property name="Radix">ASCII</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_REMOTE_INPUT_UNIT/U_ASCII_COMMAND_PARSER/state_reg">
-      <obj_property name="ElementShortName">normalizer_state_reg[2:0]</obj_property>
-      <obj_property name="ObjectShortName">normalizer_state_reg[2:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_REMOTE_INPUT_UNIT/U_ASCII_COMMAND_PARSER/o_cmd_token_valid">
-      <obj_property name="ElementShortName">o_cmd_token_valid</obj_property>
-      <obj_property name="ObjectShortName">o_cmd_token_valid</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_REMOTE_INPUT_UNIT/U_ASCII_COMMAND_PARSER/o_cmd_token_code">
-      <obj_property name="ElementShortName">o_cmd_token_code[3:0]</obj_property>
-      <obj_property name="ObjectShortName">o_cmd_token_code[3:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_REMOTE_INPUT_UNIT/U_CMD_TOKEN_PULSER/state_reg">
-      <obj_property name="ElementShortName">decoder_state_reg</obj_property>
-      <obj_property name="ObjectShortName">decoder_state_reg</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/tb_ascii_uart_sensor_pipeline/DUT/w_cmd_btnR">
-      <obj_property name="ElementShortName">w_cmd_btnR</obj_property>
-      <obj_property name="ObjectShortName">w_cmd_btnR</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/tb_ascii_uart_sensor_pipeline/DUT/w_cmd_status">
-      <obj_property name="ElementShortName">w_cmd_status</obj_property>
-      <obj_property name="ObjectShortName">w_cmd_status</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/tb_ascii_uart_sensor_pipeline/DUT/w_unknown_cmd">
-      <obj_property name="ElementShortName">w_unknown_cmd</obj_property>
-      <obj_property name="ObjectShortName">w_unknown_cmd</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/tb_ascii_uart_sensor_pipeline/seen_btnR">
-      <obj_property name="ElementShortName">seen_btnR</obj_property>
-      <obj_property name="ObjectShortName">seen_btnR</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/tb_ascii_uart_sensor_pipeline/seen_status">
-      <obj_property name="ElementShortName">seen_status</obj_property>
-      <obj_property name="ObjectShortName">seen_status</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/tb_ascii_uart_sensor_pipeline/seen_unknown_cmd">
-      <obj_property name="ElementShortName">seen_unknown_cmd</obj_property>
-      <obj_property name="ObjectShortName">seen_unknown_cmd</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/tb_ascii_uart_sensor_pipeline/tx">
-      <obj_property name="ElementShortName">tx</obj_property>
-      <obj_property name="ObjectShortName">tx</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/tb_ascii_uart_sensor_pipeline/trig">
-      <obj_property name="ElementShortName">trig</obj_property>
-      <obj_property name="ObjectShortName">trig</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ascii_uart_sensor_pipeline/fnd_com">
-      <obj_property name="ElementShortName">fnd_com[3:0]</obj_property>
-      <obj_property name="ObjectShortName">fnd_com[3:0]</obj_property>
-      <obj_property name="Radix">BINARY</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ascii_uart_sensor_pipeline/fnd_data">
-      <obj_property name="ElementShortName">fnd_data[7:0]</obj_property>
-      <obj_property name="ObjectShortName">fnd_data[7:0]</obj_property>
-      <obj_property name="Radix">HEX</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ascii_uart_sensor_pipeline/led">
-      <obj_property name="ElementShortName">led[2:0]</obj_property>
-      <obj_property name="ObjectShortName">led[2:0]</obj_property>
-      <obj_property name="Radix">BINARY</obj_property>
+   <wvobject fp_name="group110" type="group">
+      <obj_property name="label">dht11</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_EXECUTE_UNIT/U_DHT11_UNIT/i_refresh_req" type="logic">
+         <obj_property name="ElementShortName">i_refresh_req</obj_property>
+         <obj_property name="ObjectShortName">i_refresh_req</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_EXECUTE_UNIT/U_DHT11_UNIT/i_show_humi" type="logic">
+         <obj_property name="ElementShortName">i_show_humi</obj_property>
+         <obj_property name="ObjectShortName">i_show_humi</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_EXECUTE_UNIT/U_DHT11_UNIT/dht11_io" type="logic">
+         <obj_property name="ElementShortName">dht11_io</obj_property>
+         <obj_property name="ObjectShortName">dht11_io</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_EXECUTE_UNIT/U_DHT11_UNIT/o_temp" type="array">
+         <obj_property name="ElementShortName">o_temp[7:0]</obj_property>
+         <obj_property name="ObjectShortName">o_temp[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_EXECUTE_UNIT/U_DHT11_UNIT/o_humi" type="array">
+         <obj_property name="ElementShortName">o_humi[7:0]</obj_property>
+         <obj_property name="ObjectShortName">o_humi[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_EXECUTE_UNIT/U_DHT11_UNIT/o_valid" type="logic">
+         <obj_property name="ElementShortName">o_valid</obj_property>
+         <obj_property name="ObjectShortName">o_valid</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_EXECUTE_UNIT/U_DHT11_UNIT/o_fnd_com" type="array">
+         <obj_property name="ElementShortName">o_fnd_com[3:0]</obj_property>
+         <obj_property name="ObjectShortName">o_fnd_com[3:0]</obj_property>
+         <obj_property name="Radix">BINARYRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_EXECUTE_UNIT/U_DHT11_UNIT/o_fnd_data" type="array">
+         <obj_property name="ElementShortName">o_fnd_data[7:0]</obj_property>
+         <obj_property name="ObjectShortName">o_fnd_data[7:0]</obj_property>
+         <obj_property name="Radix">BINARYRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_EXECUTE_UNIT/U_DHT11_UNIT/w_tick_us" type="logic">
+         <obj_property name="ElementShortName">w_tick_us</obj_property>
+         <obj_property name="ObjectShortName">w_tick_us</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_EXECUTE_UNIT/U_DHT11_UNIT/w_valid" type="logic">
+         <obj_property name="ElementShortName">w_valid</obj_property>
+         <obj_property name="ObjectShortName">w_valid</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_EXECUTE_UNIT/U_DHT11_UNIT/w_humi" type="array">
+         <obj_property name="ElementShortName">w_humi[7:0]</obj_property>
+         <obj_property name="ObjectShortName">w_humi[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/U_EXECUTE_UNIT/U_DHT11_UNIT/w_temp" type="array">
+         <obj_property name="ElementShortName">w_temp[7:0]</obj_property>
+         <obj_property name="ObjectShortName">w_temp[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/w_execute_dht11_humi" type="array">
+         <obj_property name="ElementShortName">w_execute_dht11_humi[7:0]</obj_property>
+         <obj_property name="ObjectShortName">w_execute_dht11_humi[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/w_execute_dht11_fnd_data" type="array">
+         <obj_property name="ElementShortName">w_execute_dht11_fnd_data[7:0]</obj_property>
+         <obj_property name="ObjectShortName">w_execute_dht11_fnd_data[7:0]</obj_property>
+         <obj_property name="Radix">BINARYRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/w_execute_dht11_fnd_com" type="array">
+         <obj_property name="ElementShortName">w_execute_dht11_fnd_com[3:0]</obj_property>
+         <obj_property name="ObjectShortName">w_execute_dht11_fnd_com[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/w_dht11_refresh_req" type="logic">
+         <obj_property name="ElementShortName">w_dht11_refresh_req</obj_property>
+         <obj_property name="ObjectShortName">w_dht11_refresh_req</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/DUT/w_dht11_show_humi" type="logic">
+         <obj_property name="ElementShortName">w_dht11_show_humi</obj_property>
+         <obj_property name="ObjectShortName">w_dht11_show_humi</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/SIM_BAUD_F_COUNT" type="array">
+         <obj_property name="ElementShortName">SIM_BAUD_F_COUNT[31:0]</obj_property>
+         <obj_property name="ObjectShortName">SIM_BAUD_F_COUNT[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/BIT_PERIOD_NS" type="array">
+         <obj_property name="ElementShortName">BIT_PERIOD_NS[31:0]</obj_property>
+         <obj_property name="ObjectShortName">BIT_PERIOD_NS[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/MAX_EXPECT_BYTES" type="array">
+         <obj_property name="ElementShortName">MAX_EXPECT_BYTES[31:0]</obj_property>
+         <obj_property name="ObjectShortName">MAX_EXPECT_BYTES[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/TB_RESET_CYCLES" type="array">
+         <obj_property name="ElementShortName">TB_RESET_CYCLES[31:0]</obj_property>
+         <obj_property name="ObjectShortName">TB_RESET_CYCLES[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/tb_dht11_oe" type="logic">
+         <obj_property name="ElementShortName">tb_dht11_oe</obj_property>
+         <obj_property name="ObjectShortName">tb_dht11_oe</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ascii_uart_sensor_pipeline/tb_dht11_data" type="logic">
+         <obj_property name="ElementShortName">tb_dht11_data</obj_property>
+         <obj_property name="ObjectShortName">tb_dht11_data</obj_property>
+      </wvobject>
    </wvobject>
 </wave_config>

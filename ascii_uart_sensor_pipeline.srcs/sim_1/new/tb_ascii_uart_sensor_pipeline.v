@@ -29,6 +29,8 @@ module tb_ascii_uart_sensor_pipeline;
     reg sw15;
     reg rx;
     reg echo;
+    reg tb_dht11_oe;
+    reg tb_dht11_data;
     wire dht11_io;
     wire tx;
     wire trig;
@@ -43,6 +45,8 @@ module tb_ascii_uart_sensor_pipeline;
     defparam DUT.U_REMOTE_INPUT_UNIT.U_UART_RX_FIFO.U_BAUD_TICK_GEN.F_COUNT = SIM_BAUD_F_COUNT;
     defparam DUT.U_REMOTE_OUTPUT_UNIT.U_UART_TX_UNIT.U_UART_TX_FIFO.U_UART.U_BAUD_TICK_GEN.F_COUNT = SIM_BAUD_F_COUNT;
     defparam U_TB_BAUD_TICK_GEN.F_COUNT = SIM_BAUD_F_COUNT;
+
+    assign dht11_io = tb_dht11_oe ? tb_dht11_data : 1'bz;
 
     ascii_uart_sensor_pipeline DUT (
         .clk(clk),
@@ -114,16 +118,13 @@ module tb_ascii_uart_sensor_pipeline;
         reg [7:0] expected_byte;
         begin
             for (idx = 0; idx < expected_len; idx = idx + 1) begin
-                expected_byte = expected_text[((expected_len - 1 - idx) * 8) +: 8];
+                expected_byte = expected_text[((expected_len-1-idx)*8)+:8];
                 recv_uart_byte(rx_byte);
                 if (rx_byte !== expected_byte) begin
                     $fatal(
                         1,
                         "UART text mismatch at idx=%0d expected=%02h actual=%02h",
-                        idx,
-                        expected_byte,
-                        rx_byte
-                    );
+                        idx, expected_byte, rx_byte);
                 end
             end
         end
@@ -197,7 +198,8 @@ module tb_ascii_uart_sensor_pipeline;
             case (expected_context)
                 2'd0: expect_uart_bytes({"CTX=wt", 8'h0D, 8'h0A}, 8);
                 2'd3: expect_uart_bytes({"CTX=dht11", 8'h0D, 8'h0A}, 11);
-                default: $fatal(1, "unexpected expected_context=%0d", expected_context);
+                default:
+                $fatal(1, "unexpected expected_context=%0d", expected_context);
             endcase
             expect_uart_bytes({"ACT=stat_rpt", 8'h0D, 8'h0A}, 14);
 
@@ -209,6 +211,82 @@ module tb_ascii_uart_sensor_pipeline;
             expect_prefix_and_skip_line("SR04=", 5);
             expect_prefix_and_skip_line("DHT11=", 6);
             expect_uart_bytes({8'h0D, 8'h0A}, 2);
+        end
+    endtask
+
+    task automatic dht11_unit_test;
+        input [7:0] humi_int;
+        input [7:0] temp_int;
+        input checksum_error;
+
+        reg [7:0] checksum;
+        reg [39:0] data_stream;
+        integer bit_idx;
+        begin
+            checksum = humi_int + 8'h00 + temp_int + 8'h00;
+
+            if (checksum_error) begin
+                checksum = checksum + 8'd1;
+            end
+
+            data_stream = {
+                humi_int,  // humidity integer
+                8'h00,  // humidity decimal
+                temp_int,  // temperature integer
+                8'h00,  // temperature decimal
+                checksum  // checksum
+            };
+
+            // 기본적으로 센서는 DATA line을 놓고 있음
+            tb_dht11_oe = 1'b0;
+            tb_dht11_data = 1'b1;
+
+            // DUT가 DHT11 start signal을 보내는지 기다림
+            // FPGA가 dht11_io를 LOW로 당김
+            wait (dht11_io === 1'b0);
+
+            // FPGA start LOW가 끝나고 HIGH로 올라오는지 기다림
+            wait (dht11_io === 1'b1);
+
+            // DUT가 WAIT 상태를 지나고 line을 release할 시간을 조금 줌
+            #40_000;  // 40us
+
+            // 이제 testbench가 DHT11 센서 역할 시작
+            tb_dht11_data = 1'b0;
+            tb_dht11_oe   = 1'b1;
+
+            // DHT11 response LOW 80us
+            #80_000;
+
+            // DHT11 response HIGH 80us
+            tb_dht11_data = 1'b1;
+            #80_000;
+
+            // 40bit data 전송, MSB부터
+            for (bit_idx = 39; bit_idx >= 0; bit_idx = bit_idx - 1) begin
+                // 각 bit 시작 LOW 50us
+                tb_dht11_data = 1'b0;
+                #50_000;
+
+                // HIGH 시간으로 0/1 구분
+                tb_dht11_data = 1'b1;
+
+                if (data_stream[bit_idx]) begin
+                    #70_000;  // bit 1
+                end else begin
+                    #26_000;  // bit 0
+                end
+            end
+
+            // 마지막 LOW 후 line release
+            tb_dht11_data = 1'b0;
+            #50_000;
+
+            tb_dht11_oe   = 1'b0;
+            tb_dht11_data = 1'b1;
+
+            #100_000;
+
         end
     endtask
 
@@ -231,6 +309,9 @@ module tb_ascii_uart_sensor_pipeline;
         rx = 1'b1;
         echo = 1'b0;
 
+        tb_dht11_oe = 1'b0;
+        tb_dht11_data = 1'b1;
+
         repeat (TB_RESET_CYCLES) @(negedge clk);
         tb_rst = 1'b0;
         repeat (TB_RESET_CYCLES) @(negedge clk);
@@ -251,6 +332,14 @@ module tb_ascii_uart_sensor_pipeline;
         sw1 = 1'b1;
         sw0 = 1'b1;
         repeat (4) @(posedge clk);
+        // DHT11 context 진입 후 refresh_req가 발생하면,
+        // testbench가 가짜 DHT11 센서처럼 응답한다.
+        fork
+            dht11_unit_test(8'd60, 8'd25, 1'b0);
+        join
+        // DHT11 측정 완료까지 대기
+        // 19ms start + response/data 시간 고려
+        #30_000_000;
         send_text_status();
         expect_status_frame(2'd3);
 
