@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_remote_input_unit_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl"/>
+            <top_module name="tb_remote_input_unit"/>
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <wvobject type="logic" fp_name="/tb_remote_input_unit/rst">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_remote_input_unit/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group1">
+      <obj_property name="label">remote_input_unit_check</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"/>
+      <wvobject type="logic" fp_name="/tb_remote_input_unit/rx">
+         <obj_property name="ElementShortName">rx</obj_property>
+         <obj_property name="ObjectShortName">rx</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_remote_input_unit/DUT/U_UART_RX_FIFO/o_byte_valid">
+         <obj_property name="ElementShortName">o_byte_valid</obj_property>
+         <obj_property name="ObjectShortName">o_byte_valid</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_remote_input_unit/DUT/U_UART_RX_FIFO/o_byte">
+         <obj_property name="ElementShortName">o_byte[7:0]</obj_property>
+         <obj_property name="ObjectShortName">o_byte[7:0]</obj_property>
+         <obj_property name="Radix">ASCII</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_remote_input_unit/DUT/U_PC_COMMAND_NORMALIZER/o_token_valid">
+         <obj_property name="ElementShortName">o_token_valid</obj_property>
+         <obj_property name="ObjectShortName">o_token_valid</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_remote_input_unit/DUT/U_PC_COMMAND_NORMALIZER/o_token_code">
+         <obj_property name="ElementShortName">o_token_code[3:0]</obj_property>
+         <obj_property name="ObjectShortName">o_token_code[3:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_remote_input_unit/cmd_btnR">
+         <obj_property name="ElementShortName">cmd_btnR</obj_property>
+         <obj_property name="ObjectShortName">cmd_btnR</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_remote_input_unit/cmd_snap">
+         <obj_property name="ElementShortName">cmd_snap</obj_property>
+         <obj_property name="ObjectShortName">cmd_snap</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_remote_input_unit/unknown_cmd">
+         <obj_property name="ElementShortName">unknown_cmd</obj_property>
+         <obj_property name="ObjectShortName">unknown_cmd</obj_property>
+      </wvobject>
+   </wvobject>
+</wave_config>
