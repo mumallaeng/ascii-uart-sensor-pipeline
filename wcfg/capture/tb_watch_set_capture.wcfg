@@ -1,0 +1,301 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_time_set_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="tb_time_set" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="25000" />
+      <ZoomEndTime time="495000" />
+      <Cursor1Time time="30000" />
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="162" />
+      <ValueColumnWidth column_width="104" />
+   </column_width_setting>
+   <WVObjectSize size="5" />
+   <wave_markers>
+      <marker label="RESET_OFF" time="30000" />
+      <marker label="LIVE_TRACK_DONE" time="45000" />
+      <marker label="SET_ENTER_DONE" time="70000" />
+      <marker label="SEC_PLUS_MINUS_DONE" time="110000" />
+      <marker label="SEC_TENS_DONE" time="150000" />
+      <marker label="FORMAT_TOGGLE_DONE" time="220000" />
+      <marker label="MIN_EDIT_DONE" time="270000" />
+      <marker label="MIN_WRAP_DONE" time="330000" />
+      <marker label="HOUR_WRAP_DONE" time="390000" />
+      <marker label="MSEC_WRAP_DONE" time="450000" />
+      <marker label="TENS_WRAP_DONE" time="540000" />
+   </wave_markers>
+   <wvobject type="logic" fp_name="/tb_time_set/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+      <obj_property name="CustomSignalColor">#D0D0D0</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="capture_group1">
+      <obj_property name="label">Live Value Tracking</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded" />
+      <wvobject type="logic" fp_name="/tb_time_set/rst">
+         <obj_property name="ElementShortName">rst</obj_property>
+         <obj_property name="ObjectShortName">rst</obj_property>
+         <obj_property name="CustomSignalColor">#D0D0D0</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_time_set/i_set_mode">
+         <obj_property name="ElementShortName">i_set_mode</obj_property>
+         <obj_property name="ObjectShortName">i_set_mode</obj_property>
+         <obj_property name="CustomSignalColor">#4A90E2</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_time_set/U0/live_hour">
+         <obj_property name="ElementShortName">live_hour[4:0]</obj_property>
+         <obj_property name="ObjectShortName">live_hour[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="CustomSignalColor">#A8A8A8</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_time_set/U0/live_min">
+         <obj_property name="ElementShortName">live_min[5:0]</obj_property>
+         <obj_property name="ObjectShortName">live_min[5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="CustomSignalColor">#A8A8A8</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_time_set/U0/live_sec">
+         <obj_property name="ElementShortName">live_sec[5:0]</obj_property>
+         <obj_property name="ObjectShortName">live_sec[5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="CustomSignalColor">#A8A8A8</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_time_set/U0/live_msec">
+         <obj_property name="ElementShortName">live_msec[6:0]</obj_property>
+         <obj_property name="ObjectShortName">live_msec[6:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="CustomSignalColor">#A8A8A8</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_time_set/U0/set_hour_reg">
+         <obj_property name="ElementShortName">set_hour_reg[4:0]</obj_property>
+         <obj_property name="ObjectShortName">set_hour_reg[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="CustomSignalColor">#2CB1A6</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_time_set/U0/set_min_reg">
+         <obj_property name="ElementShortName">set_min_reg[5:0]</obj_property>
+         <obj_property name="ObjectShortName">set_min_reg[5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="CustomSignalColor">#2CB1A6</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_time_set/U0/set_sec_reg">
+         <obj_property name="ElementShortName">set_sec_reg[5:0]</obj_property>
+         <obj_property name="ObjectShortName">set_sec_reg[5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="CustomSignalColor">#2CB1A6</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_time_set/U0/set_msec_reg">
+         <obj_property name="ElementShortName">set_msec_reg[6:0]</obj_property>
+         <obj_property name="ObjectShortName">set_msec_reg[6:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="CustomSignalColor">#2CB1A6</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="capture_group2">
+      <obj_property name="label">Second One-Step Edit</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded" />
+      <wvobject type="array" fp_name="/tb_time_set/i_set_index">
+         <obj_property name="ElementShortName">i_set_index[1:0]</obj_property>
+         <obj_property name="ObjectShortName">i_set_index[1:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="CustomSignalColor">#2F6DB5</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_time_set/U0/set_index_reg">
+         <obj_property name="ElementShortName">set_index_reg[1:0]</obj_property>
+         <obj_property name="ObjectShortName">set_index_reg[1:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="CustomSignalColor">#2F6DB5</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_time_set/i_increment">
+         <obj_property name="ElementShortName">i_increment</obj_property>
+         <obj_property name="ObjectShortName">i_increment</obj_property>
+         <obj_property name="CustomSignalColor">#F5A623</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_time_set/i_decrement">
+         <obj_property name="ElementShortName">i_decrement</obj_property>
+         <obj_property name="ObjectShortName">i_decrement</obj_property>
+         <obj_property name="CustomSignalColor">#F5A623</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_time_set/U0/set_sec_reg">
+         <obj_property name="ElementShortName">set_sec_reg[5:0]</obj_property>
+         <obj_property name="ObjectShortName">set_sec_reg[5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="CustomSignalColor">#2CB1A6</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="capture_group3">
+      <obj_property name="label">Second Ten-Step Edit</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded" />
+      <wvobject type="logic" fp_name="/tb_time_set/i_increment_tens">
+         <obj_property name="ElementShortName">i_increment_tens</obj_property>
+         <obj_property name="ObjectShortName">i_increment_tens</obj_property>
+         <obj_property name="CustomSignalColor">#D48806</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_time_set/i_decrement_tens">
+         <obj_property name="ElementShortName">i_decrement_tens</obj_property>
+         <obj_property name="ObjectShortName">i_decrement_tens</obj_property>
+         <obj_property name="CustomSignalColor">#D48806</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_time_set/U0/set_sec_reg">
+         <obj_property name="ElementShortName">set_sec_reg[5:0]</obj_property>
+         <obj_property name="ObjectShortName">set_sec_reg[5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="CustomSignalColor">#2CB1A6</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="capture_group4">
+      <obj_property name="label">12h 24h Toggle Applied</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded" />
+      <wvobject type="array" fp_name="/tb_time_set/U0/set_hour_reg">
+         <obj_property name="ElementShortName">set_hour_reg[4:0]</obj_property>
+         <obj_property name="ObjectShortName">set_hour_reg[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="CustomSignalColor">#2CB1A6</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_time_set/U0/live_hour">
+         <obj_property name="ElementShortName">live_hour[4:0]</obj_property>
+         <obj_property name="ObjectShortName">live_hour[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="CustomSignalColor">#A8A8A8</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="capture_group5">
+      <obj_property name="label">Minute Wrap Check</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded" />
+      <wvobject type="array" fp_name="/tb_time_set/U0/set_index_reg">
+         <obj_property name="ElementShortName">set_index_reg[1:0]</obj_property>
+         <obj_property name="ObjectShortName">set_index_reg[1:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="CustomSignalColor">#2F6DB5</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_time_set/i_increment">
+         <obj_property name="ElementShortName">i_increment</obj_property>
+         <obj_property name="ObjectShortName">i_increment</obj_property>
+         <obj_property name="CustomSignalColor">#F5A623</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_time_set/i_decrement">
+         <obj_property name="ElementShortName">i_decrement</obj_property>
+         <obj_property name="ObjectShortName">i_decrement</obj_property>
+         <obj_property name="CustomSignalColor">#F5A623</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_time_set/U0/set_min_reg">
+         <obj_property name="ElementShortName">set_min_reg[5:0]</obj_property>
+         <obj_property name="ObjectShortName">set_min_reg[5:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="CustomSignalColor">#2CB1A6</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="capture_group6">
+      <obj_property name="label">Hour Wrap Check</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded" />
+      <wvobject type="array" fp_name="/tb_time_set/U0/set_index_reg">
+         <obj_property name="ElementShortName">set_index_reg[1:0]</obj_property>
+         <obj_property name="ObjectShortName">set_index_reg[1:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="CustomSignalColor">#2F6DB5</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_time_set/i_increment">
+         <obj_property name="ElementShortName">i_increment</obj_property>
+         <obj_property name="ObjectShortName">i_increment</obj_property>
+         <obj_property name="CustomSignalColor">#F5A623</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_time_set/i_decrement">
+         <obj_property name="ElementShortName">i_decrement</obj_property>
+         <obj_property name="ObjectShortName">i_decrement</obj_property>
+         <obj_property name="CustomSignalColor">#F5A623</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_time_set/U0/set_hour_reg">
+         <obj_property name="ElementShortName">set_hour_reg[4:0]</obj_property>
+         <obj_property name="ObjectShortName">set_hour_reg[4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="CustomSignalColor">#2CB1A6</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="capture_group7">
+      <obj_property name="label">Msec and Tens Wrap Check</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded" />
+      <wvobject type="array" fp_name="/tb_time_set/U0/set_index_reg">
+         <obj_property name="ElementShortName">set_index_reg[1:0]</obj_property>
+         <obj_property name="ObjectShortName">set_index_reg[1:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="CustomSignalColor">#2F6DB5</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_time_set/i_increment">
+         <obj_property name="ElementShortName">i_increment</obj_property>
+         <obj_property name="ObjectShortName">i_increment</obj_property>
+         <obj_property name="CustomSignalColor">#F5A623</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_time_set/i_decrement">
+         <obj_property name="ElementShortName">i_decrement</obj_property>
+         <obj_property name="ObjectShortName">i_decrement</obj_property>
+         <obj_property name="CustomSignalColor">#F5A623</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_time_set/i_increment_tens">
+         <obj_property name="ElementShortName">i_increment_tens</obj_property>
+         <obj_property name="ObjectShortName">i_increment_tens</obj_property>
+         <obj_property name="CustomSignalColor">#D48806</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_time_set/i_decrement_tens">
+         <obj_property name="ElementShortName">i_decrement_tens</obj_property>
+         <obj_property name="ObjectShortName">i_decrement_tens</obj_property>
+         <obj_property name="CustomSignalColor">#D48806</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_time_set/U0/set_msec_reg">
+         <obj_property name="ElementShortName">set_msec_reg[6:0]</obj_property>
+         <obj_property name="ObjectShortName">set_msec_reg[6:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="CustomSignalColor">#2CB1A6</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+   </wvobject>
+</wave_config>
