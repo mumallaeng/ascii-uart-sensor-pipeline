@@ -59,6 +59,7 @@ module legacy_top_watch_stopwatch #(
     wire                      w_btnL_hold;
     wire                      w_btnU_hold;
     wire                      w_btnD_hold;
+    wire                      w_btnC;
     wire                      w_sw0;
     wire                      w_sw15;
 
@@ -78,12 +79,14 @@ module legacy_top_watch_stopwatch #(
         .btnD       (btnD),
         .btnL       (btnL),
         .btnR       (btnR),
+        .btnC       (1'b0),
         .sw0        (sw0),
         .sw15       (sw15),
         .o_btnU     (w_btnR),
         .o_btnD     (w_btnL),
         .o_btnL     (w_btnU),
         .o_btnR     (w_btnD),
+        .o_btnC     (w_btnC),
         .o_btnU_hold(w_btnR_hold),
         .o_btnD_hold(w_btnL_hold),
         .o_btnL_hold(w_btnU_hold),
