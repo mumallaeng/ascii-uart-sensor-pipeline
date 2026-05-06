@@ -1,44 +1,34 @@
 `timescale 1ns / 1ps
 
-module sr04 (
+module sr04_unit (
     input clk,
     input rst,
-    input btn_R,
+    input i_refresh_req,
     input echo,
     output trig,
-    output [3:0] fnd_com,
-    output [7:0] fnd_data
+    output [8:0] o_distance_cm,
+    output [3:0] o_fnd_com,
+    output [7:0] o_fnd_data
 );
 
-    wire w_sr04_start;
     wire w_tick_us;
-    wire [8:0] w_distance;
-
-    button_debounce U_BTN_DEBOUNCE (
-        .clk(clk),
-        .rst(rst),
-        .i_btn(btn_R),
-        .o_btn_sync(),
-        .o_btn_level(),
-        .o_btn_tick(w_sr04_start)
-    );
-
+   
     sr04_controller U_SR04_CNTL (
         .clk(clk),
         .rst(rst),
-        .sr04_start(w_sr04_start),
+        .sr04_start(i_refresh_req),
         .tick_us(w_tick_us),
         .echo(echo),
         .trig(trig),
-        .distance(w_distance)
+        .o_distance_cm(o_distance_cm)
     );
 
     sr04_fnd_controller U_FND_CNTL (
         .clk(clk),
         .rst(rst),
-        .fnd_in({5'b00000, w_distance}),
-        .fnd_com(fnd_com),
-        .fnd_data(fnd_data)
+        .fnd_in({5'b00000, o_distance_cm}),
+        .fnd_com(o_fnd_com),
+        .fnd_data(o_fnd_data)
     );
 
     sr04_tick_gen_us U_TICK_GEN (
@@ -46,6 +36,7 @@ module sr04 (
         .rst(rst),
         .tick_us(w_tick_us)
     );
+
 endmodule
 
 module sr04_controller (
@@ -55,7 +46,7 @@ module sr04_controller (
     input tick_us,
     input echo,
     output trig,
-    output [8:0] distance
+    output [8:0] o_distance_cm
 );
 
     localparam [1:0] IDLE = 2'd0;

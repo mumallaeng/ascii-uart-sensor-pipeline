@@ -86,6 +86,7 @@ module execute_unit (
 
     // 센서 wrapper는 hierarchy와 top 경계를 먼저 확정하기 위한 placeholder다.
     // 실제 측정 core 연동은 팀원 요청 문서 기준으로 대체한다.
+
     sr04_unit U_SR04_UNIT (
         .clk(clk),
         .rst(w_execute_rst),
@@ -316,30 +317,6 @@ module watch_stopwatch_unit #(
         .fnd_com(o_fnd_com),
         .fnd_data(o_fnd_data)
     );
-
-endmodule
-
-// sr04_unit은 execute 경계 확인용 placeholder wrapper다.
-module sr04_unit (
-    input clk,
-    input rst,
-    input i_refresh_req,
-    input echo,
-    output trig,
-    output [8:0] o_distance_cm,
-    output [3:0] o_fnd_com,
-    output [7:0] o_fnd_data
-);
-
-    wire unused_clk = clk;
-    wire unused_rst = rst;
-    wire unused_refresh_req = i_refresh_req;
-    wire unused_echo = echo;
-
-    assign trig = 1'b0;
-    assign o_distance_cm = 9'd0;
-    assign o_fnd_com = 4'b1111;
-    assign o_fnd_data = 8'hFF;
 
 endmodule
 
