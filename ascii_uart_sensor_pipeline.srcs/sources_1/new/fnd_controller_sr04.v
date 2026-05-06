@@ -14,7 +14,7 @@ module sr04_fnd_controller #(
     wire [3:0] w_out_mux;
     wire [3:0] w_digit_1, w_digit_10, w_digit_100, w_digit_1000;
     wire [1:0] w_digit_sel;
-    wire w_1khz;
+    wire w_scan_tick;
 
     sr04_digit_splitter U_DIGIT_SPLIT (
         .digit_in(fnd_in),
@@ -47,12 +47,13 @@ module sr04_fnd_controller #(
     ) U_CLK_DIV_1KHZ (
         .clk(clk),
         .rst(rst),
-        .o_1khz(w_1khz)
+        .o_scan_tick(w_scan_tick)
     );
 
     sr04_counter_4 U_COUNTER_4 (
-        .clk(w_1khz),
+        .clk(clk),
         .rst(rst),
+        .i_scan_tick(w_scan_tick),
         .digit_sel(w_digit_sel)
     );
 
@@ -70,7 +71,7 @@ module sr04_clk_div_1khz #(
 ) (
     input  clk,
     input  rst,
-    output o_1khz
+    output o_scan_tick
 );
 
     localparam integer HALF_PERIOD_COUNT = CLK_FREQ_HZ / (SCAN_HZ * 2);
@@ -79,18 +80,19 @@ module sr04_clk_div_1khz #(
     );
 
     reg [COUNTER_WIDTH-1:0] counter_reg;
-    reg o_1khz_reg;
+    reg scan_tick_reg;
 
-    assign o_1khz = o_1khz_reg;
+    assign o_scan_tick = scan_tick_reg;
 
     always @(posedge clk, posedge rst) begin
         if (rst) begin
             counter_reg <= {COUNTER_WIDTH{1'b0}};
-            o_1khz_reg  <= 1'b0;
+            scan_tick_reg <= 1'b0;
         end else begin
+            scan_tick_reg <= 1'b0;
             if (counter_reg == HALF_PERIOD_COUNT - 1) begin
                 counter_reg <= {COUNTER_WIDTH{1'b0}};
-                o_1khz_reg  <= ~o_1khz_reg;
+                scan_tick_reg <= 1'b1;
             end else begin
                 counter_reg <= counter_reg + 1'b1;
             end
@@ -102,6 +104,7 @@ endmodule
 module sr04_counter_4 (
     input clk,
     input rst,
+    input i_scan_tick,
     output [1:0] digit_sel
 );
     reg [1:0] counter_reg;
@@ -111,7 +114,7 @@ module sr04_counter_4 (
     always @(posedge clk, posedge rst) begin //clk 신호의 상승엣지가 발생할때마다 begin end 구현해라
         if (rst) begin
             counter_reg <= 0;  // 0 초기화 <= 0
-        end else begin
+        end else if (i_scan_tick) begin
             counter_reg <= counter_reg + 1;
         end
     end

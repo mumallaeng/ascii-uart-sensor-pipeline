@@ -20,9 +20,9 @@ module fnd_controller_dht11 #(
     wire [3:0] w_tm_digit_1, w_tm_digit_10, w_tm_digit_100, w_tm_digit_1000;
     wire [3:0] w_hm_digit_1, w_hm_digit_10, w_hm_digit_100, w_hm_digit_1000;
     wire [1:0] w_digit_sel;
-    wire w_1khz;
+    wire w_scan_tick;
 
-    digit_splitter U_tm_DIGIT_SPLIT (
+    dht11_digit_splitter U_tm_DIGIT_SPLIT (
         .digit_in(tm),
         .digit_1(w_tm_digit_1),
         .digit_10(w_tm_digit_10),
@@ -30,7 +30,7 @@ module fnd_controller_dht11 #(
         .digit_1000(w_tm_digit_1000)
     );
 
-    digit_splitter U_hm_DIGIT_SPLIT (
+    dht11_digit_splitter U_hm_DIGIT_SPLIT (
         .digit_in(hm),
         .digit_1(w_hm_digit_1),
         .digit_10(w_hm_digit_10),
@@ -38,7 +38,7 @@ module fnd_controller_dht11 #(
         .digit_1000(w_hm_digit_1000)
     );
 
-    mux_4x1 U_MUX_4X1_TM (
+    dht11_mux_4x1 U_MUX_4X1_TM (
         .in0(w_tm_digit_1),  // digit 1
         .in1(w_tm_digit_10),  // digit 10
         .in2(w_tm_digit_100), // digit 100
@@ -47,7 +47,7 @@ module fnd_controller_dht11 #(
         .out_mux(w_out_mux_tm)
     );
 
-    mux_4x1 U_MUX_4X1_HM (
+    dht11_mux_4x1 U_MUX_4X1_HM (
         .in0(w_hm_digit_1),  // digit 1
         .in1(w_hm_digit_10),  // digit 10
         .in2(w_hm_digit_100), // digit 100
@@ -56,7 +56,7 @@ module fnd_controller_dht11 #(
         .out_mux(w_out_mux_hm)
     );
 
-    mux_2x1 U_MUX_2X1 (
+    dht11_mux_2x1 U_MUX_2X1 (
     .in0(w_out_mux_tm),  // digit 1
     .in1(w_out_mux_hm),  // digit 10
     .sel(sw15),  // to select input
@@ -64,42 +64,43 @@ module fnd_controller_dht11 #(
 );
 
 
-    bcd U_BCD (
+    dht11_bcd U_BCD (
         .bin(w_out_mux),
         .bcd_data(fnd_data)
     );
 
 
-    clk_div_1khz #(
+    dht11_clk_div_1khz #(
         .CLK_FREQ_HZ(CLK_FREQ_HZ),
         .SCAN_HZ(SCAN_HZ)
     ) U_CLK_DIV_1KHZ (
         .clk(clk),
         .rst(rst),
-        .o_1khz(w_1khz)
+        .o_scan_tick(w_scan_tick)
     );
 
-    counter_4 U_COUNTER_4 (
-        .clk(w_1khz),
+    dht11_counter_4 U_COUNTER_4 (
+        .clk(clk),
         .rst(rst),
+        .i_scan_tick(w_scan_tick),
         .digit_sel(w_digit_sel)
     );
 
 
-    decoder_2x4 U_DECODER_2x4 (
+    dht11_decoder_2x4 U_DECODER_2x4 (
         .decoder_in(w_digit_sel),
         .fnd_com(fnd_com)
     );
 
 endmodule
 
-module clk_div_1khz #(
+module dht11_clk_div_1khz #(
     parameter integer CLK_FREQ_HZ = 100_000_000,
     parameter integer SCAN_HZ = 1000
 ) (
     input  clk,
     input  rst,
-    output o_1khz
+    output o_scan_tick
 );
 
     localparam integer HALF_PERIOD_COUNT = CLK_FREQ_HZ / (SCAN_HZ * 2);
@@ -108,18 +109,19 @@ module clk_div_1khz #(
     );
 
     reg [COUNTER_WIDTH-1:0] counter_reg;
-    reg o_1khz_reg;
+    reg scan_tick_reg;
 
-    assign o_1khz = o_1khz_reg;
+    assign o_scan_tick = scan_tick_reg;
 
     always @(posedge clk, posedge rst) begin
         if (rst) begin
             counter_reg <= {COUNTER_WIDTH{1'b0}};
-            o_1khz_reg  <= 1'b0;
+            scan_tick_reg <= 1'b0;
         end else begin
+            scan_tick_reg <= 1'b0;
             if (counter_reg == HALF_PERIOD_COUNT - 1) begin
                 counter_reg <= {COUNTER_WIDTH{1'b0}};
-                o_1khz_reg  <= ~o_1khz_reg;
+                scan_tick_reg <= 1'b1;
             end else begin
                 counter_reg <= counter_reg + 1'b1;
             end
@@ -128,9 +130,10 @@ module clk_div_1khz #(
 
 endmodule
 
-module counter_4 (
+module dht11_counter_4 (
     input clk,
     input rst,
+    input i_scan_tick,
     output [1:0] digit_sel
 );
     reg [1:0] counter_reg;
@@ -140,7 +143,7 @@ module counter_4 (
     always @(posedge clk, posedge rst) begin //clk 신호의 상승엣지가 발생할때마다 begin end 구현해라
         if (rst) begin
             counter_reg <= 0;  // 0 초기화 <= 0
-        end else begin
+        end else if (i_scan_tick) begin
             counter_reg <= counter_reg + 1;
         end
     end
@@ -149,7 +152,7 @@ endmodule
 
 
 
-module decoder_2x4 (
+module dht11_decoder_2x4 (
     input [1:0] decoder_in,
     output reg [3:0] fnd_com
 );
@@ -166,7 +169,7 @@ module decoder_2x4 (
 endmodule
 
 
-module digit_splitter (
+module dht11_digit_splitter (
     input  [ 7:0] digit_in,   //관련된 입력 14bit로
     output [ 3:0] digit_1,
     output [ 3:0] digit_10,
@@ -182,7 +185,7 @@ module digit_splitter (
 
 endmodule
 
-module mux_4x1 (
+module dht11_mux_4x1 (
     input [3:0] in0,  // digit 1
     input [3:0] in1,  // digit 10
     input [3:0] in2,  // digit 100
@@ -205,7 +208,7 @@ module mux_4x1 (
 
 endmodule
 
-module mux_2x1 (
+module dht11_mux_2x1 (
     input [3:0] in0,  // digit 1
     input [3:0] in1,  // digit 10
     input sel,  // to select input
@@ -225,7 +228,7 @@ module mux_2x1 (
 endmodule
 
 
-module bcd (
+module dht11_bcd (
     input [3:0] bin,
     output reg [7:0] bcd_data
 );
@@ -253,4 +256,3 @@ module bcd (
     end
 
 endmodule
-

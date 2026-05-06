@@ -29,7 +29,7 @@ module fnd_controller #(
     wire [3:0] w_min_digit_1, w_min_digit_10;
     wire [3:0] w_hour_digit_1, w_hour_digit_10;
     wire [ 2:0] w_digit_sel;
-    wire        w_1khz;
+    wire        w_scan_tick;
     localparam integer BLINK_HALF_PERIOD = (MAIN_CLK_100MHZ / 2 <= 1) ? 1 : (MAIN_CLK_100MHZ / 2);
     localparam integer BLINK_COUNTER_WIDTH = (BLINK_HALF_PERIOD <= 1) ? 1 : $clog2(BLINK_HALF_PERIOD);
 
@@ -161,12 +161,15 @@ module fnd_controller #(
     ) U_CLK_DIV_1KHZ (
         .clk(clk),
         .rst(rst),
-        .o_1khz(w_1khz)
+        .o_scan_tick(w_scan_tick)
     );
 
+    // 분주 신호를 새 clock으로 쓰지 않고,
+    // 원래 100MHz clk 하나만 유지한 채 scan tick일 때만 자리 선택을 진행한다.
     counter_8 U_COUNTER_8 (
-        .clk(w_1khz),
+        .clk(clk),
         .rst(rst),
+        .i_scan_tick(w_scan_tick),
         .digit_sel(w_digit_sel)
     );
 
@@ -185,7 +188,7 @@ module clk_div_1khz #(
 ) (
     input  clk,
     input  rst,
-    output o_1khz
+    output o_scan_tick
 );
 
     localparam integer HALF_PERIOD_COUNT = MAIN_CLK_100MHZ / (SCAN_HZ * 2);
@@ -194,18 +197,19 @@ module clk_div_1khz #(
     );
 
     reg [COUNTER_WIDTH-1:0] counter_reg;
-    reg o_1khz_reg;
+    reg scan_tick_reg;
 
-    assign o_1khz = o_1khz_reg;
+    assign o_scan_tick = scan_tick_reg;
 
     always @(posedge clk, posedge rst) begin
         if (rst) begin
             counter_reg <= {COUNTER_WIDTH{1'b0}};
-            o_1khz_reg  <= 1'b0;
+            scan_tick_reg <= 1'b0;
         end else begin
+            scan_tick_reg <= 1'b0;
             if (counter_reg == HALF_PERIOD_COUNT - 1) begin
                 counter_reg <= {COUNTER_WIDTH{1'b0}};
-                o_1khz_reg  <= ~o_1khz_reg;
+                scan_tick_reg <= 1'b1;
             end else begin
                 counter_reg <= counter_reg + 1'b1;
             end
@@ -217,6 +221,7 @@ endmodule
 module counter_8 (
     input clk,
     input rst,
+    input i_scan_tick,
     output [2:0] digit_sel
 );
     reg [2:0] counter_reg;
@@ -226,7 +231,7 @@ module counter_8 (
     always @(posedge clk, posedge rst) begin //clk 신호의 상승엣지가 발생할때마다 begin end 구현해라
         if (rst) begin
             counter_reg <= 0;  // 0 초기화 <= 0
-        end else begin
+        end else if (i_scan_tick) begin
             counter_reg <= counter_reg + 1;
         end
     end

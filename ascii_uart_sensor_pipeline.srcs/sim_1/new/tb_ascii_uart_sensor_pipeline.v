@@ -24,7 +24,9 @@ module tb_ascii_uart_sensor_pipeline;
     reg btnL;
     reg btnR;
     reg btnC;
-    reg [15:0] sw;
+    reg sw0;
+    reg sw1;
+    reg sw15;
     reg rx;
     reg echo;
     wire dht11_io;
@@ -49,7 +51,9 @@ module tb_ascii_uart_sensor_pipeline;
         .btnL(btnL),
         .btnR(btnR),
         .btnC(btnC),
-        .sw(sw),
+        .sw0(sw0),
+        .sw1(sw1),
+        .sw15(sw15),
         .rx(rx),
         .echo(echo),
         .dht11_io(dht11_io),
@@ -221,7 +225,9 @@ module tb_ascii_uart_sensor_pipeline;
         btnL = 1'b0;
         btnR = 1'b0;
         btnC = 1'b0;
-        sw = 16'h0000;
+        sw0 = 1'b0;
+        sw1 = 1'b0;
+        sw15 = 1'b0;
         rx = 1'b1;
         echo = 1'b0;
 
@@ -242,7 +248,8 @@ module tb_ascii_uart_sensor_pipeline;
 
         // Scenario 2: DHT11 context status 응답.
         $display("TB scenario2: dht11 status");
-        sw[1:0] = 2'b11;
+        sw1 = 1'b1;
+        sw0 = 1'b1;
         repeat (4) @(posedge clk);
         send_text_status();
         expect_status_frame(2'd3);
@@ -254,7 +261,8 @@ module tb_ascii_uart_sensor_pipeline;
 
         // Scenario 4: delete/backspace가 섞여도 command가 정상 복원되는지 확인.
         $display("TB scenario4: status with delete edit");
-        sw[1:0] = 2'b00;
+        sw1 = 1'b0;
+        sw0 = 1'b0;
         repeat (4) @(posedge clk);
         send_text_status_with_delete_edit();
         expect_status_frame(2'd0);

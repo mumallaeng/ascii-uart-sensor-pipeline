@@ -4,7 +4,7 @@
 ## Constrained ports:
 ## - clk
 ## - btnU, btnD, btnL, btnR, btnC
-## - sw[0], sw[1], sw[15]
+## - sw0, sw1, sw15
 ## - rx
 ## - echo, trig, dht11_io
 ## - fnd_com[3:0], fnd_data[7:0]
@@ -28,9 +28,9 @@ set_property -dict { PACKAGE_PIN T17 IOSTANDARD LVCMOS33 } [get_ports btnR]
 set_property -dict { PACKAGE_PIN U18 IOSTANDARD LVCMOS33 } [get_ports btnC]
 
 ## Switches used by INPUT stage
-set_property -dict { PACKAGE_PIN V17 IOSTANDARD LVCMOS33 } [get_ports {sw[0]}]
-set_property -dict { PACKAGE_PIN V16 IOSTANDARD LVCMOS33 } [get_ports {sw[1]}]
-set_property -dict { PACKAGE_PIN R2  IOSTANDARD LVCMOS33 } [get_ports {sw[15]}]
+set_property -dict { PACKAGE_PIN V17 IOSTANDARD LVCMOS33 } [get_ports sw0]
+set_property -dict { PACKAGE_PIN V16 IOSTANDARD LVCMOS33 } [get_ports sw1]
+set_property -dict { PACKAGE_PIN R2  IOSTANDARD LVCMOS33 } [get_ports sw15]
 
 ## USB-UART host TX -> FPGA rx
 set_property -dict { PACKAGE_PIN B18 IOSTANDARD LVCMOS33 } [get_ports rx]
