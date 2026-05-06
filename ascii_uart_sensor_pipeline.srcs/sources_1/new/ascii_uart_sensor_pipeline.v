@@ -4,7 +4,6 @@
 
 module ascii_uart_sensor_pipeline (
     input clk,
-    input rst,
     input btnU,
     input btnD,
     input btnL,
@@ -21,9 +20,19 @@ module ascii_uart_sensor_pipeline (
     output [2:0] led
 );
 
-    // 현재 top은 INPUT, decision_unit, execute_unit까지 연결된 상태다.
-    // sensor wrapper와 OUTPUT 통합은 후속 작업이므로,
-    // 최종 보드 출력은 파일 하단에서 안전한 기본값으로 묶어 둔다.
+    // 현재 top은 INPUT, decision_unit, execute_unit, display_unit까지 연결된 상태다.
+    // 보드 bring-up에서는 sw14 같은 임시 reset 입력을 쓰지 않기 위해
+    // configuration 직후 짧은 power-on reset만 내부에서 만들어 공통 rst로 쓴다.
+    reg [7:0] r_por_reset_count = 8'd0;
+    wire w_reset;
+
+    assign w_reset = (r_por_reset_count != 8'hFF);
+
+    always @(posedge clk) begin
+        if (w_reset) begin
+            r_por_reset_count <= r_por_reset_count + 1'b1;
+        end
+    end
 
     // INPUT 구간에서 정리된 local button/switch bundle.
     wire w_btnU;
@@ -85,14 +94,28 @@ module ascii_uart_sensor_pipeline (
     wire [5:0] w_execute_stopwatch_sec;
     wire [5:0] w_execute_stopwatch_min;
     wire [4:0] w_execute_stopwatch_hour;
+    wire [3:0] w_execute_watch_stopwatch_fnd_com;
+    wire [7:0] w_execute_watch_stopwatch_fnd_data;
+    wire [3:0] w_execute_sr04_fnd_com;
+    wire [7:0] w_execute_sr04_fnd_data;
+    wire [3:0] w_execute_dht11_fnd_com;
+    wire [7:0] w_execute_dht11_fnd_data;
+    wire [8:0] w_execute_sr04_distance_cm;
+    wire [7:0] w_execute_dht11_temp;
+    wire [7:0] w_execute_dht11_humi;
     wire w_execute_sr04_trig;
     wire w_execute_led_watch_12h;
     wire w_execute_led_stopwatch;
     wire w_execute_led_dht11_valid;
 
+    // OUTPUT 구간 display 결과.
+    wire [3:0] w_display_fnd_com;
+    wire [7:0] w_display_fnd_data;
+    wire w_remote_output_tx;
+
     input_conditioning U_INPUT_CONDITIONING (
         .clk(clk),
-        .rst(rst),
+        .rst(w_reset),
         .btnU(btnU),
         .btnD(btnD),
         .btnL(btnL),
@@ -115,7 +138,7 @@ module ascii_uart_sensor_pipeline (
 
     context_manager U_CONTEXT_MANAGER (
         .clk(clk),
-        .rst(rst),
+        .rst(w_reset),
         .i_sw_context(sw[1:0]),
         .i_sw15(w_sw15),
         .o_current_context(w_current_context),
@@ -126,7 +149,7 @@ module ascii_uart_sensor_pipeline (
 
     remote_input_unit U_REMOTE_INPUT_UNIT (
         .clk(clk),
-        .rst(rst),
+        .rst(w_reset),
         .rx(rx),
         .cmd_btnR(w_cmd_btnR),
         .cmd_btnR_hold(w_cmd_btnR_hold),
@@ -140,7 +163,7 @@ module ascii_uart_sensor_pipeline (
 
     decision_unit U_DECISION_UNIT (
         .clk(clk),
-        .rst(rst),
+        .rst(w_reset),
         .i_btnU(w_btnU),
         .i_btnD(w_btnD),
         .i_btnL(w_btnL),
@@ -182,7 +205,7 @@ module ascii_uart_sensor_pipeline (
 
     execute_unit U_EXECUTE_UNIT (
         .clk(clk),
-        .rst(rst),
+        .rst(w_reset),
         .i_current_context(w_current_context),
         .i_watch_12h(w_watch_12h),
         .i_dht11_show_humi(w_dht11_show_humi),
@@ -211,18 +234,63 @@ module ascii_uart_sensor_pipeline (
         .o_stopwatch_sec(w_execute_stopwatch_sec),
         .o_stopwatch_min(w_execute_stopwatch_min),
         .o_stopwatch_hour(w_execute_stopwatch_hour),
+        .o_watch_stopwatch_fnd_com(w_execute_watch_stopwatch_fnd_com),
+        .o_watch_stopwatch_fnd_data(w_execute_watch_stopwatch_fnd_data),
+        .o_sr04_fnd_com(w_execute_sr04_fnd_com),
+        .o_sr04_fnd_data(w_execute_sr04_fnd_data),
+        .o_dht11_fnd_com(w_execute_dht11_fnd_com),
+        .o_dht11_fnd_data(w_execute_dht11_fnd_data),
+        .o_sr04_distance_cm(w_execute_sr04_distance_cm),
+        .o_dht11_temp(w_execute_dht11_temp),
+        .o_dht11_humi(w_execute_dht11_humi),
         .o_sr04_trig(w_execute_sr04_trig),
         .o_led_watch_12h(w_execute_led_watch_12h),
         .o_led_stopwatch(w_execute_led_stopwatch),
         .o_led_dht11_valid(w_execute_led_dht11_valid)
     );
 
-    // event_log_unit/display_unit/sensor wrapper가 붙기 전까지는
-    // 외부 출력들을 보드 안전 기본값으로 유지한다.
-    assign tx = 1'b1;
+    display_unit U_DISPLAY_UNIT (
+        .i_current_context(w_current_context),
+        .i_watch_stopwatch_fnd_com(w_execute_watch_stopwatch_fnd_com),
+        .i_watch_stopwatch_fnd_data(w_execute_watch_stopwatch_fnd_data),
+        .i_sr04_fnd_com(w_execute_sr04_fnd_com),
+        .i_sr04_fnd_data(w_execute_sr04_fnd_data),
+        .i_dht11_fnd_com(w_execute_dht11_fnd_com),
+        .i_dht11_fnd_data(w_execute_dht11_fnd_data),
+        .o_fnd_com(w_display_fnd_com),
+        .o_fnd_data(w_display_fnd_data)
+    );
+
+    remote_output_unit U_REMOTE_OUTPUT_UNIT (
+        .clk(clk),
+        .rst(w_reset),
+        .i_unknown_cmd(w_unknown_cmd),
+        .i_log_src(w_log_src),
+        .i_log_cmd(w_log_cmd),
+        .i_log_evt(w_log_evt),
+        .i_log_act(w_log_act),
+        .i_log_req(w_log_req),
+        .i_current_context(w_current_context),
+        .i_watch_live_time(w_execute_watch_live_time),
+        .i_stopwatch_hour(w_execute_stopwatch_hour),
+        .i_stopwatch_min(w_execute_stopwatch_min),
+        .i_stopwatch_sec(w_execute_stopwatch_sec),
+        .i_sr04_distance_cm(w_execute_sr04_distance_cm),
+        .i_dht_temp(w_execute_dht11_temp),
+        .i_dht_humi(w_execute_dht11_humi),
+        .i_dht_valid(w_execute_led_dht11_valid),
+        .o_tx(w_remote_output_tx)
+    );
+
     assign trig = w_execute_sr04_trig;
-    assign fnd_com = 4'b1111;
-    assign fnd_data = 8'hFF;
-    assign led = {w_execute_led_dht11_valid, w_execute_led_stopwatch, w_execute_led_watch_12h};
+    assign tx = w_remote_output_tx;
+    assign fnd_com = w_display_fnd_com;
+    assign fnd_data = w_display_fnd_data;
+    // 보드 bring-up 단계에서는 LED를 sensor valid/status보다
+    // switch/context debug 쪽에 우선 배정한다.
+    // led[0] = current_context bit0
+    // led[1] = current_context bit1
+    // led[2] = sw15 option
+    assign led = {w_sw15, w_current_context[1], w_current_context[0]};
 
 endmodule

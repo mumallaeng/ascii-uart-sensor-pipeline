@@ -308,7 +308,7 @@ module action_dispatcher (
             o_log_evt = i_canonical_evt;
             o_log_act = `ACT_NO_ACTION;
             // canonical event가 valid라면, 나중에 context가 기능 동작을
-            // 무시하더라도 event_log_unit 쪽에서는 이 요청을 볼 수 있어야 한다.
+            // 무시하더라도 remote_output_unit 쪽에서는 이 요청을 볼 수 있어야 한다.
             o_log_req = 1'b1;
 
             case (i_canonical_evt)

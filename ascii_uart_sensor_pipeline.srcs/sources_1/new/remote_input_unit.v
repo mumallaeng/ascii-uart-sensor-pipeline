@@ -147,6 +147,24 @@ module ascii_command_parser #(
         end
     endfunction
 
+    function is_edit_key;
+        input [7:0] byte_value;
+        begin
+            is_edit_key = (byte_value == 8'h08) || (byte_value == 8'h7F);
+        end
+    endfunction
+
+    function is_command_char;
+        input [7:0] byte_value;
+        begin
+            is_command_char =
+                ((byte_value >= "a") && (byte_value <= "z")) ||
+                ((byte_value >= "A") && (byte_value <= "Z")) ||
+                ((byte_value >= "0") && (byte_value <= "9")) ||
+                (byte_value == "_");
+        end
+    endfunction
+
     function match_btnR;
         input [3:0] cmd_char_count;
         input [7:0] c0, c1, c2, c3;
@@ -257,7 +275,7 @@ module ascii_command_parser #(
             IDLE: begin
                 cmd_char_count_next = 4'd0;
                 cmd_token_code_next = `CMD_NONE;
-                if (i_ascii_byte_valid && !is_delimiter(i_ascii_byte)) begin
+                if (i_ascii_byte_valid && is_command_char(i_ascii_byte)) begin
                     // 새 command 문자열의 첫 글자.
                     cmd_chars_next[0] = i_ascii_byte;
                     cmd_char_count_next = 4'd1;
@@ -270,6 +288,19 @@ module ascii_command_parser #(
                     if (is_delimiter(i_ascii_byte)) begin
                         // CR/LF가 command token의 끝을 뜻한다.
                         state_next = DECODE;
+                    end else if (is_edit_key(i_ascii_byte)) begin
+                        // screen 등의 terminal에서 들어오는 backspace/delete는
+                        // token 앞에 이상한 제어문자가 붙지 않게 편집 키로 처리한다.
+                        if (cmd_char_count_reg > 0) begin
+                            cmd_chars_next[cmd_char_count_reg - 1'b1] = 8'h00;
+                            cmd_char_count_next = cmd_char_count_reg - 1'b1;
+                            if (cmd_char_count_reg == 1) begin
+                                state_next = IDLE;
+                            end
+                        end
+                    end else if (!is_command_char(i_ascii_byte)) begin
+                        // command에 쓰지 않는 제어문자/기호는 조용히 무시한다.
+                        state_next = COLLECT;
                     end else if (cmd_char_count_reg < MAX_CMD_CHARS) begin
                         // 아직 끝 문자가 아니므로 계속 모은다.
                         cmd_chars_next[cmd_char_count_reg] = i_ascii_byte;
