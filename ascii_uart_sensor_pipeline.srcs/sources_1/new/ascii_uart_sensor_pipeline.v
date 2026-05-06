@@ -21,8 +21,8 @@ module ascii_uart_sensor_pipeline (
     output [2:0] led
 );
 
-    // 현재 top은 INPUT direct child와 decision_unit까지 연결된 상태다.
-    // FUNCTION / OUTPUT 통합은 후속 작업이므로,
+    // 현재 top은 INPUT, decision_unit, execute_unit까지 연결된 상태다.
+    // sensor wrapper와 OUTPUT 통합은 후속 작업이므로,
     // 최종 보드 출력은 파일 하단에서 안전한 기본값으로 묶어 둔다.
 
     // INPUT 구간에서 정리된 local button/switch bundle.
@@ -74,6 +74,21 @@ module ascii_uart_sensor_pipeline (
     wire [`EVT_W-1:0] w_log_evt;
     wire [`ACT_W-1:0] w_log_act;
     wire w_log_req;
+
+    // EXECUTE 구간 watch/stopwatch 상태 출력.
+    wire w_execute_display_mode;
+    wire w_execute_watch_set_mode;
+    wire [1:0] w_execute_watch_set_index;
+    wire [23:0] w_execute_watch_live_time;
+    wire [23:0] w_execute_watch_set_time;
+    wire [6:0] w_execute_stopwatch_msec;
+    wire [5:0] w_execute_stopwatch_sec;
+    wire [5:0] w_execute_stopwatch_min;
+    wire [4:0] w_execute_stopwatch_hour;
+    wire w_execute_sr04_trig;
+    wire w_execute_led_watch_12h;
+    wire w_execute_led_stopwatch;
+    wire w_execute_led_dht11_valid;
 
     input_conditioning U_INPUT_CONDITIONING (
         .clk(clk),
@@ -165,12 +180,49 @@ module ascii_uart_sensor_pipeline (
         .o_log_req(w_log_req)
     );
 
-    // function_unit/event_log_unit/display_unit이 붙기 전까지는
+    execute_unit U_EXECUTE_UNIT (
+        .clk(clk),
+        .rst(rst),
+        .i_current_context(w_current_context),
+        .i_watch_12h(w_watch_12h),
+        .i_dht11_show_humi(w_dht11_show_humi),
+        .i_watch_display_toggle_pulse(w_watch_display_toggle_pulse),
+        .i_watch_set_mode_toggle_pulse(w_watch_set_mode_toggle_pulse),
+        .i_watch_set_index_next_pulse(w_watch_set_index_next_pulse),
+        .i_watch_value_inc_pulse(w_watch_value_inc_pulse),
+        .i_watch_value_inc_tens_pulse(w_watch_value_inc_tens_pulse),
+        .i_watch_value_dec_pulse(w_watch_value_dec_pulse),
+        .i_watch_value_dec_tens_pulse(w_watch_value_dec_tens_pulse),
+        .i_stopwatch_display_toggle_pulse(w_stopwatch_display_toggle_pulse),
+        .i_stopwatch_clear_pulse(w_stopwatch_clear_pulse),
+        .i_stopwatch_count_dir_toggle_pulse(w_stopwatch_count_dir_toggle_pulse),
+        .i_stopwatch_run_toggle_pulse(w_stopwatch_run_toggle_pulse),
+        .i_soft_clear_pulse(w_soft_clear_pulse),
+        .i_sr04_refresh_req(w_sr04_refresh_req),
+        .i_dht11_refresh_req(w_dht11_refresh_req),
+        .i_echo(echo),
+        .io_dht11(dht11_io),
+        .o_display_mode(w_execute_display_mode),
+        .o_watch_set_mode(w_execute_watch_set_mode),
+        .o_watch_set_index(w_execute_watch_set_index),
+        .o_watch_live_time(w_execute_watch_live_time),
+        .o_watch_set_time(w_execute_watch_set_time),
+        .o_stopwatch_msec(w_execute_stopwatch_msec),
+        .o_stopwatch_sec(w_execute_stopwatch_sec),
+        .o_stopwatch_min(w_execute_stopwatch_min),
+        .o_stopwatch_hour(w_execute_stopwatch_hour),
+        .o_sr04_trig(w_execute_sr04_trig),
+        .o_led_watch_12h(w_execute_led_watch_12h),
+        .o_led_stopwatch(w_execute_led_stopwatch),
+        .o_led_dht11_valid(w_execute_led_dht11_valid)
+    );
+
+    // event_log_unit/display_unit/sensor wrapper가 붙기 전까지는
     // 외부 출력들을 보드 안전 기본값으로 유지한다.
     assign tx = 1'b1;
-    assign trig = 1'b0;
+    assign trig = w_execute_sr04_trig;
     assign fnd_com = 4'b1111;
     assign fnd_data = 8'hFF;
-    assign led = 3'b000;
+    assign led = {w_execute_led_dht11_valid, w_execute_led_stopwatch, w_execute_led_watch_12h};
 
 endmodule

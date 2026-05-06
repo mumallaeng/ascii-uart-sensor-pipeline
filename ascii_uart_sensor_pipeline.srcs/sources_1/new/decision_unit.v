@@ -234,7 +234,7 @@ endmodule
 
 // action_dispatcher는 context를 반영해 실제 의미를 부여하는 단계다.
 // canonical event 하나를 받아서
-// - function_unit 제어 pulse
+// - execute_unit 제어 pulse
 // - sensor refresh request
 // - event log metadata
 // 로 바꾼다.
