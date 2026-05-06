@@ -37,9 +37,9 @@ set_property -dict { PACKAGE_PIN B18 IOSTANDARD LVCMOS33 } [get_ports rx]
 set_property -dict { PACKAGE_PIN A18 IOSTANDARD LVCMOS33 } [get_ports tx]
 
 ## JA / JB sensor bring-up pins
-set_property -dict { PACKAGE_PIN L2 IOSTANDARD LVCMOS33 } [get_ports echo]
-set_property -dict { PACKAGE_PIN J1 IOSTANDARD LVCMOS33 } [get_ports trig]
-set_property -dict { PACKAGE_PIN A14 IOSTANDARD LVCMOS33 PULLUP true } [get_ports dht11_io]
+set_property -dict { PACKAGE_PIN A16 IOSTANDARD LVCMOS33 } [get_ports echo]
+set_property -dict { PACKAGE_PIN A14 IOSTANDARD LVCMOS33 } [get_ports trig]
+set_property -dict { PACKAGE_PIN J1 IOSTANDARD LVCMOS33 PULLUP true } [get_ports dht11_io]
 
 ## LEDs used for context/option bring-up debug
 set_property -dict { PACKAGE_PIN U16 IOSTANDARD LVCMOS33 } [get_ports {led[0]}]
